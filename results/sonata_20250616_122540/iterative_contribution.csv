@@ -1,0 +1,6 @@
+step,feature_name,marginal_contribution,cumulative_performance
+1,"time_features_macro_set, fourier_features_order_3",0.5185215936191341,0.5185215936191341
+5,"lag_features_macro_set_on_fourier_sin_1, rolling_features_macro_set_on_dayofweek",0.017076405455121124,0.5063929462938791
+2,"fourier_sin_1_x_dayofweek, year_x_month",-0.00035094790220002725,0.518170645716934
+3,"embed_0_win365, fourier_features_order_4",-0.010529434979922425,0.5076412107370116
+4,"deleted_1_features, embed_0_win90, fourier_cos_1_x_day",-0.018324669898253654,0.489316540838758

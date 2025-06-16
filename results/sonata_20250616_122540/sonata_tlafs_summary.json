@@ -1,0 +1,172 @@
+{
+    "probe_model": "Sonata_Transformer_Specialist",
+    "best_score_during_search": 0.5185215936191341,
+    "best_feature_plan": [
+        [
+            {
+                "function": "create_time_features_macro",
+                "args": {}
+            },
+            {
+                "function": "create_fourier_features",
+                "args": {
+                    "col": "date",
+                    "order": 3
+                }
+            }
+        ]
+    ],
+    "final_features": [
+        "year",
+        "month",
+        "day",
+        "dayofweek",
+        "fourier_sin_1",
+        "fourier_cos_1",
+        "fourier_sin_2",
+        "fourier_cos_2",
+        "fourier_sin_3",
+        "fourier_cos_3"
+    ],
+    "final_validation_scores_all_models": {
+        "LightGBM": {
+            "r2": 0.5185215936191341,
+            "mae": 2.259186976429874,
+            "rmse": 2.8475696520397813
+        },
+        "SimpleNN": {
+            "r2": 0.5634556386547416,
+            "mae": 2.1382365100024496,
+            "rmse": 2.711440883330159
+        },
+        "EnhancedNN": {
+            "r2": 0.5960241588776751,
+            "mae": 2.036709193922069,
+            "rmse": 2.6083366607880203
+        },
+        "Transformer": {
+            "r2": 0.531839073686837,
+            "mae": 2.199681590877167,
+            "rmse": 2.8079122430518693
+        }
+    },
+    "best_final_model": {
+        "name": "EnhancedNN",
+        "metrics": {
+            "r2": 0.5960241588776751,
+            "mae": 2.036709193922069,
+            "rmse": 2.6083366607880203
+        }
+    },
+    "run_history": [
+        {
+            "iteration": 0,
+            "plan": "Baseline",
+            "feature_name": "Baseline",
+            "performance": 0.0,
+            "adopted": true,
+            "available_features": [],
+            "importances": "Empty DataFrame\nColumns: []\nIndex: []"
+        },
+        {
+            "iteration": 1,
+            "plan": "[{'function': 'create_time_features_macro', 'args': {}}, {'function': 'create_fourier_features', 'args': {'col': 'date', 'order': 3}}]",
+            "feature_name": "time_features_macro_set, fourier_features_order_3",
+            "performance": 0.5185215936191341,
+            "adopted": true,
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3"
+            ],
+            "importances": "         feature  importance\n0           year         681\n1  fourier_sin_1         416\n2            day         333\n3  fourier_cos_1         313\n4      dayofweek         286\n5  fourier_sin_2         283\n6  fourier_sin_3         259\n7  fourier_cos_3         234\n8  fourier_cos_2         152\n9          month          43"
+        },
+        {
+            "iteration": 2,
+            "plan": "[{'function': 'create_interaction_features', 'args': {'col1': 'fourier_sin_1', 'col2': 'dayofweek'}}, {'function': 'create_interaction_features', 'args': {'col1': 'year', 'col2': 'month'}}]",
+            "feature_name": "fourier_sin_1_x_dayofweek, year_x_month",
+            "performance": 0.518170645716934,
+            "adopted": false,
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3"
+            ],
+            "importances": "         feature  importance\n0           year         681\n1  fourier_sin_1         416\n2            day         333\n3  fourier_cos_1         313\n4      dayofweek         286\n5  fourier_sin_2         283\n6  fourier_sin_3         259\n7  fourier_cos_3         234\n8  fourier_cos_2         152\n9          month          43"
+        },
+        {
+            "iteration": 3,
+            "plan": "[{'function': 'create_embedding_features', 'args': {'col': 'month', 'window_size': 365}}, {'function': 'create_fourier_features', 'args': {'col': 'date', 'order': 4}}]",
+            "feature_name": "embed_0_win365, fourier_features_order_4",
+            "performance": 0.5076412107370116,
+            "adopted": false,
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3"
+            ],
+            "importances": "         feature  importance\n0           year         681\n1  fourier_sin_1         416\n2            day         333\n3  fourier_cos_1         313\n4      dayofweek         286\n5  fourier_sin_2         283\n6  fourier_sin_3         259\n7  fourier_cos_3         234\n8  fourier_cos_2         152\n9          month          43"
+        },
+        {
+            "iteration": 4,
+            "plan": "[{'function': 'delete_features', 'args': {'cols': ['month']}}, {'function': 'create_embedding_features', 'args': {'col': 'day', 'window_size': 90}}, {'function': 'create_interaction_features', 'args': {'col1': 'fourier_cos_1', 'col2': 'day'}}]",
+            "feature_name": "deleted_1_features, embed_0_win90, fourier_cos_1_x_day",
+            "performance": 0.489316540838758,
+            "adopted": false,
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3"
+            ],
+            "importances": "         feature  importance\n0           year         681\n1  fourier_sin_1         416\n2            day         333\n3  fourier_cos_1         313\n4      dayofweek         286\n5  fourier_sin_2         283\n6  fourier_sin_3         259\n7  fourier_cos_3         234\n8  fourier_cos_2         152\n9          month          43"
+        },
+        {
+            "iteration": 5,
+            "plan": "[{'function': 'create_lag_features_macro', 'args': {'col': 'fourier_sin_1'}}, {'function': 'create_rolling_features_macro', 'args': {'col': 'dayofweek'}}]",
+            "feature_name": "lag_features_macro_set_on_fourier_sin_1, rolling_features_macro_set_on_dayofweek",
+            "performance": 0.5063929462938791,
+            "adopted": false,
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3"
+            ],
+            "importances": "         feature  importance\n0           year         681\n1  fourier_sin_1         416\n2            day         333\n3  fourier_cos_1         313\n4      dayofweek         286\n5  fourier_sin_2         283\n6  fourier_sin_3         259\n7  fourier_cos_3         234\n8  fourier_cos_2         152\n9          month          43"
+        }
+    ]
+}

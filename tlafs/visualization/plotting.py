@@ -149,15 +149,27 @@ def plot_learning_curves(train_scores: List[float], val_scores: List[float],
     else:
         plt.show()
 
-def visualize_final_predictions(dates, y_true, y_pred, best_model_name, probe_name, best_model_metrics, results_dir):
+def visualize_final_predictions(dates, y_true, y_pred, best_model_name, probe_name, best_model_metrics, results_dir, filename_suffix=""):
     """
     可视化最终的真实值与预测值对比图。
     """
+    # 解决中文显示问题
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体
+    plt.rcParams['axes.unicode_minus'] = False  # 解决保存图像是负号'-'显示为方块的问题
+
     plt.style.use('seaborn-v0_8-whitegrid')
     plt.figure(figsize=(15, 7))
     
-    plt.plot(dates, y_true, label='实际值', color='dodgerblue', alpha=0.9)
-    plt.plot(dates, y_pred, label=f'预测值 ({best_model_name})', color='orangered', linestyle='--')
+    # 确保 dates 是 pandas DatetimeIndex 或类似类型，以便绘图
+    # 如果不是，尝试转换
+    try:
+        plot_dates = pd.to_datetime(dates)
+    except (TypeError, ValueError):
+        # 如果转换失败，可能已经是可绘制的格式，直接使用
+        plot_dates = dates
+        
+    plt.plot(plot_dates, y_true, label='实际值', color='dodgerblue', alpha=0.9)
+    plt.plot(plot_dates, y_pred, label=f'预测值 ({best_model_name})', color='orangered', linestyle='--')
     
     title = (f"最终验证 (探针: {probe_name}) - 表现最佳模型: {best_model_name}\n"
              f"R²: {best_model_metrics['r2']:.4f} | MAE: {best_model_metrics['mae']:.4f} | RMSE: {best_model_metrics['rmse']:.4f}")
@@ -168,7 +180,10 @@ def visualize_final_predictions(dates, y_true, y_pred, best_model_name, probe_na
     plt.legend()
     plt.tight_layout()
     
-    plot_path = os.path.join(results_dir, f"final_predictions_probe_{probe_name}.png")
+    # 使用 suffix 构建文件名
+    plot_filename = f"final_predictions_probe_{probe_name}{filename_suffix}.png"
+    plot_path = os.path.join(results_dir, plot_filename)
+    
     plt.savefig(plot_path)
     print(f"✅ 最终预测图已保存至: {plot_path}")
     plt.close() 

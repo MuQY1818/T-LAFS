@@ -23,7 +23,7 @@ def main():
     
     # ===== 配置变量 =====
     DATASET_TYPE = 'min_daily_temps'
-    N_ITERATIONS = 5
+    N_ITERATIONS = 7
     TARGET_COL = 'temp'
     
     print("="*80)
@@ -166,51 +166,61 @@ def main():
                     print(f"  - {feature}")
                 
                 # 删除低重要性特征
-                df_pruned = best_df.copy()
-                df_pruned = df_pruned.drop(columns=features_to_drop)
+                df_pruned = best_df.drop(columns=features_to_drop)
                 
-                # 重新评估模型性能
+                # 重新评估剪枝后的模型性能
                 print("\n重新评估剪枝后的模型性能...")
-                X_pruned = df_pruned.drop(columns=[TARGET_COL, 'date'])
-                y_pruned = df_pruned[TARGET_COL]
-                
-                # 使用LightGBM评估
-                lgb_model = lgb.LGBMRegressor(random_state=42)
-                lgb_model.fit(X_pruned, y_pruned)
-                y_pred_pruned = lgb_model.predict(X_pruned)
-                r2_pruned = r2_score(y_pruned, y_pred_pruned)
-                
-                print(f"\n剪枝后的性能:")
-                print(f"  - 特征数量: {len(X_pruned.columns)} (减少了 {len(features_to_drop)} 个特征)")
-                print(f"  - R² 分数: {r2_pruned:.4f}")
-                
-                # 如果性能没有显著下降，使用剪枝后的特征集
-                if r2_pruned >= best_final_metrics['r2'] - 0.01:  # 允许0.01的性能下降
-                    print("\n✅ 采用剪枝后的特征集")
-                    best_df = df_pruned
-                    best_final_metrics = final_metrics[max(final_metrics, key=lambda k: final_metrics[k]['r2'])]
-                    best_result_data = final_results[max(final_metrics, key=lambda k: final_metrics[k]['r2'])]
+                final_metrics_pruned, final_results_pruned = evaluate_on_multiple_models(
+                    df_pruned,
+                    TARGET_COL
+                )
+
+                if final_metrics_pruned:
+                    best_model_name_pruned = max(final_metrics_pruned, key=lambda k: final_metrics_pruned[k]['r2'])
+                    best_metrics_pruned = final_metrics_pruned[best_model_name_pruned]
+                    r2_pruned = best_metrics_pruned['r2']
+                    
+                    print(f"\n剪枝后的性能 (最佳模型: {best_model_name_pruned}):")
+                    print(f"  - 特征数量: {len(df_pruned.columns) - 2} (从 {len(best_df.columns) - 2} 减少了 {len(features_to_drop)} 个)")
+                    print(f"  - 新的 R² 分数: {r2_pruned:.4f} (原始最佳 R²: {best_final_metrics['r2']:.4f})")
+
+                    # 如果性能没有显著下降，使用剪枝后的特征集
+                    if r2_pruned >= best_final_metrics['r2'] - 0.01:  # 允许最多0.01的性能下降
+                        print("\n✅ 采用剪枝后的特征集。将更新最终结果。")
+                        best_df = df_pruned
+                        final_metrics = final_metrics_pruned
+                        final_results = final_results_pruned
+                        # 更新用于报告和可视化的最佳模型变量
+                        best_final_model_name = best_model_name_pruned
+                        best_final_metrics = best_metrics_pruned
+                        best_result_data = final_results[best_final_model_name]
+                    else:
+                        print(f"\n❌ 剪枝后性能下降超过阈值。将保持原始特征集。")
                 else:
-                    print("\n❌ 保持原始特征集")
+                    print("\n⚠️ 剪枝后模型评估失败。将保持原始特征集。")
             else:
-                print("\n没有发现需要删除的低重要性特征")
+                print("\n没有发现可以删除的低重要性或无用特征。")
 
             # --- 4. 保存所有结果 ---
-            # 从这里开始，使用最终决策的变量 (best_df, best_final_metrics, etc.)
-            best_final_metrics_after_pruning = best_final_metrics
-            best_result_data_after_pruning = best_result_data
+            print("\n" + "="*40)
+            print(f"💾 保存最终结果与可视化 💾")
+            print("="*40)
             
-            # 重新获取测试集索引，以防剪枝后的df长度变化
-            test_indices_after_pruning = best_df.index[-len(best_result_data['y_true']):]
+            # 现在, 所有变量 (best_df, best_final_metrics, etc.) 都反映了剪枝决策后的最终状态
+            
+            # 重新获取测试集索引，以防剪枝导致df变化
+            test_indices_final = best_df.index[-len(best_result_data['y_true']):]
 
+            # 使用最终确定的数据进行可视化
             visualize_final_predictions(
-                dates=best_df.loc[test_indices_after_pruning, 'date'],
+                dates=best_df.loc[test_indices_final, 'date'],
                 y_true=best_result_data['y_true'],
                 y_pred=best_result_data['y_pred'],
                 best_model_name=best_final_model_name,
-                probe_name=probe_name_for_reporting,
-                best_model_metrics=best_final_metrics_after_pruning,
-                results_dir=results_dir
+                probe_name=f"{probe_name_for_reporting}_Final", # 添加后缀以区分
+                best_model_metrics=best_final_metrics,
+                results_dir=results_dir,
+                filename_suffix="_post_pruning" # 添加文件名后缀
             )
 
             summary_data = {
@@ -218,10 +228,10 @@ def main():
                 "best_score_during_search": best_score_during_search,
                 "best_feature_plan": best_feature_plan,
                 "final_features": [col for col in best_df.columns if col not in ['date', TARGET_COL]],
-                "final_validation_scores": best_final_metrics,
+                "final_validation_scores_all_models": final_metrics,
                 "best_final_model": {
                     "name": best_final_model_name,
-                    "metrics": best_final_metrics_after_pruning
+                    "metrics": best_final_metrics
                 },
                 "run_history": tlafs_alg.history
             }
