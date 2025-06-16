@@ -6,5 +6,6 @@ matplotlib==3.9.0
 xgboost==2.0.3
 lightgbm==4.4.0
 joblib==1.4.2
-torch==2.3.0
+# 推荐先根据 https://pytorch.org/get-started/locally/ 选择合适的torch/torchvision/torchaudio 安装命令
+# torch==2.3.0
 statsmodels==0.14.2 
