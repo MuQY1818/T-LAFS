@@ -409,9 +409,24 @@ class TLAFS_Algorithm:
             "--- Current State & Task ---\n"
             f"Iteration {iteration_num}/{self.n_iterations}\n"
             f"Current features ({len(current_features)}): {summarized_features}\n"
-            f"Current MAE: {current_performance:.4f}\n\n"
+            f"Current MAE: {current_performance:.4f}\n"
         )
         
+        # Strategic Guidance based on progress
+        progress_percent = (iteration_num / self.n_iterations) * 100
+        strategic_guidance = "\n--- Strategic Guidance ---\n"
+        if progress_percent < 40:
+            strategic_guidance += "Phase 1: Foundational Feature Building (Current Progress: {:.0f}%).\n".format(progress_percent)
+            strategic_guidance += "Your priority is to build a strong baseline with simple, effective features.\n"
+            strategic_guidance += "**Strongly prefer `create_lag_features`, `create_rolling_features`, `create_fourier_features`, and `create_time_features_macro`.**\n"
+            strategic_guidance += "Avoid `create_embedding_features` and `create_mvse_features` for now, unless basic features show no improvement.\n"
+        else:
+            strategic_guidance += "Phase 2: Advanced Feature Exploration (Current Progress: {:.0f}%).\n".format(progress_percent)
+            strategic_guidance += "The feature set is now mature. You should now prioritize complex, learnable features to capture non-linear patterns.\n"
+            strategic_guidance += "**`create_mvse_features` and `create_embedding_features` are now highly recommended.**\n"
+        
+        state_summary += strategic_guidance + "\n"
+
         # Tactical observations
         last_importance_df = self.history[-1].get('importances')
         if last_importance_df is not None and not last_importance_df.empty:

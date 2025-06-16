@@ -16,8 +16,18 @@ def create_mvse_probe_features_data(df, target_col='temp', hist_len=90, num_lags
     if 'month' not in df_copy:
         df_copy['month'] = df_copy['date'].dt.month
     
+    # --- 修复数据泄露 ---
+    # 1. 定义一个训练集范围来拟合缩放器，避免看到未来的数据
+    #    我们使用数据的前80%作为训练集来拟合缩放器
+    train_size = int(len(df_copy) * 0.8)
+    if train_size < 1: train_size = len(df_copy) # 处理数据量过少的情况
+    
+    # 2. 创建并仅在训练数据上拟合缩放器
     target_scaler = MinMaxScaler()
-    df_copy['temp_scaled'] = target_scaler.fit_transform(df_copy[[target_col]])
+    target_scaler.fit(df_copy[[target_col]].iloc[:train_size])
+    
+    # 3. 将学习到的缩放规则应用到整个数据集
+    df_copy['temp_scaled'] = target_scaler.transform(df_copy[[target_col]])
     
     feature_cols = ['temp_scaled', 'dayofweek', 'month']
     
