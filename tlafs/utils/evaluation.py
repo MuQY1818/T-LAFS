@@ -29,16 +29,21 @@ def evaluate_model(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
     Returns:
         包含各种评估指标的字典
     """
+    # 避免除以零
+    y_true_safe = np.where(y_true == 0, 1e-8, y_true)
+    
     mse = mean_squared_error(y_true, y_pred)
     rmse = np.sqrt(mse)
     mae = mean_absolute_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
-    
+    mape = np.mean(np.abs((y_true - y_pred) / y_true_safe)) * 100
+
     return {
         'mse': mse,
         'rmse': rmse,
         'mae': mae,
-        'r2': r2
+        'r2': r2,
+        'mape': mape
     }
 
 def calculate_improvement(baseline_metrics: Dict[str, float], 
@@ -88,20 +93,23 @@ def probe_feature_set(df: pd.DataFrame, target_col: str, features_to_probe: list
     X = df_feat
 
     if X.empty or y.empty or len(X) < 20:
-        return 0.0, {"r2_lgbm": 0.0, "num_features": 0}, pd.DataFrame()
+        # 对于MAE/RMSE，返回一个很大的值表示差的性能
+        return np.inf, {"mae_lgbm": np.inf, "num_features": 0}, pd.DataFrame()
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
     if len(X_train) < 1 or len(X_test) < 1:
-        return 0.0, {"r2_lgbm": 0.0, "num_features": X.shape[1]}, pd.DataFrame()
+        return np.inf, {"mae_lgbm": np.inf, "num_features": X.shape[1]}, pd.DataFrame()
 
     # 使用 LightGBM 作为快速探针
     lgbm = lgb.LGBMRegressor(random_state=42, verbosity=-1)
     lgbm.fit(X_train, y_train)
     preds = lgbm.predict(X_test)
-    score = r2_score(y_test, preds)
+    
+    # 核心指标改为MAE
+    score = mean_absolute_error(y_test, preds)
 
-    primary_score = max(0.0, score)
+    primary_score = score
     
     # --- 新增：计算并返回特征重要性 ---
     importances_df = pd.DataFrame({
@@ -111,7 +119,7 @@ def probe_feature_set(df: pd.DataFrame, target_col: str, features_to_probe: list
 
     # 统一返回格式为 (score, details_dict, importances_df)
     details = {
-        "r2_lgbm": score,
+        "mae_lgbm": score, # 报告MAE
         "num_features": X.shape[1]
     }
     return primary_score, details, importances_df
@@ -167,16 +175,15 @@ def evaluate_on_multiple_models(df: pd.DataFrame, target_col: str):
             model.fit(X_train_val, y_train_val)
             preds = model.predict(X_test)
         
-        r2 = r2_score(y_test, preds)
-        mae = mean_absolute_error(y_test, preds)
-        rmse = np.sqrt(mean_squared_error(y_test, preds))
+        # 使用我们更新过的evaluate_model函数
+        metrics = evaluate_model(y_test, preds)
 
-        final_metrics[name] = {"r2": r2, "mae": mae, "rmse": rmse}
+        final_metrics[name] = metrics
         final_results[name] = {
             "dates": X_test.index.tolist(),
             "y_true": y_test.tolist(),
             "y_pred": preds.tolist()
         }
-        print(f"    - {name}: R²={r2:.4f}, MAE={mae:.4f}, RMSE={rmse:.4f}")
+        print(f"    - {name}: MAE={metrics['mae']:.4f}, RMSE={metrics['rmse']:.4f}, MAPE={metrics['mape']:.2f}%, R²={metrics['r2']:.4f}")
         
     return final_metrics, final_results 

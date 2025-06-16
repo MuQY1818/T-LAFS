@@ -24,7 +24,7 @@ from ..visualization.plotting import visualize_final_predictions
 from ..utils.training import train_pytorch_model
 from ..utils.data_utils import analyze_dataset_characteristics
 from ..analysis.feature_importance import calculate_permutation_importance
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_absolute_error
 
 # --- 经验回放区 ---
 class ExperienceReplayBuffer:
@@ -67,21 +67,21 @@ class ExperienceReplayBuffer:
         if good_samples:
             prompt_str += "\n**成功的计划 (被采纳且奖励高):**\n"
             for exp in good_samples:
-                r2 = exp['state'].get('R2 Score (raw)', -1.0)
+                mae = exp['state'].get('MAE Score', 9999.0)
                 num_feats = exp['state'].get('Number of Features', 'N/A')
                 summarized_features = TLAFS_Algorithm.summarize_feature_list(exp['state']['Available Features'])
                 plan = exp['action']
                 reward = exp['reward']
-                prompt_str += f"- 历史上下文: R²={r2:.3f}, #特征={num_feats}, 特征={summarized_features}. 计划: {plan}. 结果: 采纳, 奖励={reward:.3f}.\n"
+                prompt_str += f"- 历史上下文: MAE={mae:.4f}, #特征={num_feats}, 特征={summarized_features}. 计划: {plan}. 结果: 采纳, 奖励={reward:.3f}.\n"
         
         if bad_samples:
             prompt_str += "\n**失败的计划 (被拒绝):**\n"
             for exp in bad_samples:
-                r2 = exp['state'].get('R2 Score (raw)', -1.0)
+                mae = exp['state'].get('MAE Score', 9999.0)
                 num_feats = exp['state'].get('Number of Features', 'N/A')
                 summarized_features = TLAFS_Algorithm.summarize_feature_list(exp['state']['Available Features'])
                 plan = exp['action']
-                prompt_str += f"- 历史上下文: R²={r2:.3f}, #特征={num_feats}, 特征={summarized_features}. 计划: {plan}. 结果: 拒绝.\n"
+                prompt_str += f"- 历史上下文: MAE={mae:.4f}, #特征={num_feats}, 特征={summarized_features}. 计划: {plan}. 结果: 拒绝.\n"
             
         return prompt_str
 
@@ -108,7 +108,7 @@ class TLAFS_Algorithm:
         self.acceptance_threshold = acceptance_threshold
         self.review_interval = review_interval # 新增：复盘周期
         self.history = []
-        self.best_score = -np.inf
+        self.best_score = np.inf # MAE越小越好
         self.best_plan = []
         self.best_df = None
         self.results_dir = results_dir
@@ -267,9 +267,19 @@ class TLAFS_Algorithm:
     def _log_baseline_performance(self):
         """Calculates and logs the initial baseline performance, starting from scratch."""
         print("\nEstablishing baseline performance from scratch...")
-        # Start with no features. The baseline score is 0 for R^2,
-        # representing a model that just predicts the mean.
-        baseline_score = 0.0
+        # 建立一个只预测训练集均值的哑模型作为基线
+        # 在我们的probe_feature_set中，没有特征时会返回inf，但这里我们应该计算一个实际的基线
+        
+        # 简单地用历史均值作为预测
+        train_size = int(len(self.base_df) * 0.8)
+        train_df = self.base_df.iloc[:train_size]
+        test_df = self.base_df.iloc[train_size:]
+        
+        mean_prediction = train_df[self.target_col].mean()
+        y_true = test_df[self.target_col]
+        y_pred = np.full_like(y_true, fill_value=mean_prediction)
+        
+        baseline_score = mean_absolute_error(y_true, y_pred)
         initial_features = []
         initial_importances = pd.DataFrame()
 
@@ -286,7 +296,7 @@ class TLAFS_Algorithm:
             "available_features": initial_features,
             "importances": initial_importances
         })
-        print(f"Baseline R² score: {baseline_score:.4f} with no initial features.")
+        print(f"Baseline MAE score (predicting mean): {baseline_score:.4f} with no initial features.")
 
     def _format_history_for_prompt(self):
         """Format algorithm history into a meaningful string with marginal contributions."""
@@ -298,7 +308,7 @@ class TLAFS_Algorithm:
 
         # First entry is baseline
         baseline = self.history[0]
-        prompt_str += f"Step 0 (Baseline): Using features {self.summarize_feature_list(baseline['available_features'])}, initial R²: {baseline['performance']:.4f}.\n"
+        prompt_str += f"Step 0 (Baseline): Using features {self.summarize_feature_list(baseline['available_features'])}, initial MAE: {baseline['performance']:.4f}.\n"
 
         # Subsequent iterations
         for i in range(1, len(self.history)):
@@ -309,20 +319,21 @@ class TLAFS_Algorithm:
             feature_name = current_step['feature_name']
             performance = current_step['performance']
             prev_performance = prev_step['performance']
-            marginal_contribution = performance - prev_performance
+            # MAE越小越好，所以 improvement = old - new
+            marginal_contribution = prev_performance - performance 
             adopted = current_step['adopted']
             
             status = "✅ (Adopted)" if adopted else "❌ (Rejected)"
             analysis = ""
             if adopted:
-                if marginal_contribution > 0.001:
-                    analysis = f"Significant improvement: {marginal_contribution:+.4f}. This is a successful feature pattern."
+                if marginal_contribution > 0.001 * prev_performance: # 相对改进超过0.1%
+                    analysis = f"Significant improvement (MAE reduced by {marginal_contribution:.4f}). This is a successful feature pattern."
                 elif marginal_contribution >= 0:
-                    analysis = f"Slight improvement or neutral: {marginal_contribution:+.4f}. This is a neutral feature."
+                    analysis = f"Slight improvement or neutral (MAE reduced by {marginal_contribution:.4f}). This is a neutral feature."
                 else:
-                    analysis = f"Unexpected performance drop: {marginal_contribution:+.4f}. This is a 'toxic' feature pattern to avoid."
+                    analysis = f"Unexpected performance drop (MAE increased by {-marginal_contribution:.4f}). This is a 'toxic' feature pattern to avoid."
             else:
-                analysis = f"Plan rejected due to insufficient performance improvement (threshold: {self.acceptance_threshold})."
+                analysis = f"Plan rejected due to insufficient performance improvement (MAE did not decrease enough)."
             
             # Feature importance info
             importance_info = ""
@@ -337,7 +348,7 @@ class TLAFS_Algorithm:
                 f"\nStep {i}:\n"
                 f"  - Plan: {plan}\n"
                 f"  - Generated feature: '{feature_name}'\n"
-                f"  - Result: New R²: {performance:.4f}. {status}\n"
+                f"  - Result: New MAE: {performance:.4f}. {status}\n"
                 f"  - Analysis: {analysis}{importance_info}\n"
             )
         
@@ -398,7 +409,7 @@ class TLAFS_Algorithm:
             "--- Current State & Task ---\n"
             f"Iteration {iteration_num}/{self.n_iterations}\n"
             f"Current features ({len(current_features)}): {summarized_features}\n"
-            f"Current R²: {current_performance:.4f}\n\n"
+            f"Current MAE: {current_performance:.4f}\n\n"
         )
         
         # Tactical observations
@@ -418,7 +429,8 @@ class TLAFS_Algorithm:
         # 4. Dynamic task instruction (regular vs review)
         task_instruction = ""
         if importance_report is not None:
-            useless_features = importance_report[importance_report['importance_mean'] <= 0].index.tolist()
+            # 调整阈值，仅关注那些明显有害的特征，而不是中性特征
+            useless_features = importance_report[importance_report['importance_mean'] < -0.0001].index.tolist()
             task_instruction = (
                 "**Special Task: Review & Optimization**\n"
                 "Feature importance analysis results:\n"
@@ -426,14 +438,14 @@ class TLAFS_Algorithm:
             )
             if useless_features:
                  task_instruction += (
-                    f"Analysis shows these features may be useless or harmful: {useless_features}\n"
-                    "Your primary task is aggressive feature pruning. Create a plan to **delete all zero or negative importance features at once**. Then, you can combine other operations to further improve performance.\n"
+                    f"Analysis suggests these features might be harmful: {useless_features}\n"
+                    "Your task is to optimize the feature set. It's recommended to create a plan to **delete some of the low-importance features**. You can also combine this with other operations to improve performance.\n"
                  )
             else:
-                task_instruction += "All features are performing well. Focus on adding new features.\n"
+                task_instruction += "All features seem to be contributing positively. Focus on adding new high-quality features.\n"
 
         else:
-            task_instruction = "Your task: Based on history and current state, propose a feature engineering plan with **1-3 operations** to improve performance.\n"
+            task_instruction = "Your task: Based on history and current state, propose a feature engineering plan with **1-3 operations** to improve performance (reduce MAE).\n"
         
         state_summary += task_instruction
 
@@ -447,15 +459,20 @@ Choose one or more functions:
 2. `create_lag_features_macro(df, col)`: Creates a set of standard lag features (lags 1, 2, 3, 7, 14).
 3. `create_rolling_features_macro(df, col)`: Creates a set of standard rolling window features (windows 7, 14, 30 for mean/std).
 
+**Advanced Embedding & Probing Functions:**
+4. `create_embedding_features(df, col, window_size)`: Create embedding features from pre-trained autoencoders (sizes: 90, 365, 730).
+5. ⭐ `create_mvse_features(df, hist_len, num_lags)`: (HIGHLY RECOMMENDED) Creates robust features using a Multi-View Sequential Embedding probe. It's fast and generates a small, powerful set of ~24 features.
+   - `hist_len`: Length of historical sequence for the probe (e.g., 90).
+   - `num_lags`: Number of recent lag values to include (e.g., 14).
+
 **Basic Functions:**
-4. `create_lag_features(df, col, lags)`: Create specific lag features.
-5. `create_rolling_features(df, col, windows, aggs)`: Create specific rolling features.
-6. `create_fourier_features(df, col, order)`: Create Fourier features (note: `col` must be 'date').
-7. `create_interaction_features(df, col1, col2)`: Create interaction features.
-8. `create_embedding_features(df, col, window_size)`: Create embedding features (sizes: 90, 365, 730).
+6. `create_lag_features(df, col, lags)`: Create specific lag features.
+7. `create_rolling_features(df, col, windows, aggs)`: Create specific rolling features.
+8. `create_fourier_features(df, col, order)`: Create Fourier features (note: `col` must be 'date').
+9. `create_interaction_features(df, col1, col2)`: Create interaction features.
 
 **Optimization Functions:**
-9. `delete_features(df, cols)`: Delete one or more features.
+10. `delete_features(df, cols)`: Delete one or more features.
 
 **Output Format:**
 Your response must be a strict JSON list, even for single operations:
@@ -464,7 +481,7 @@ Your response must be a strict JSON list, even for single operations:
 **Key Rules:**
 - Plan can include 1-3 operations.
 - Only use columns from current feature set.
-- **For review tasks, must include `delete_features` operation.**
+- **For review tasks, if low-importance features are found, consider using `delete_features`.**
 - **Data Leakage Warning: `create_interaction_features` cannot use target column ('{target_col}') directly. If you need target info, first create lag/rolling features.**
 - **Strategy 1: Avoid repeating recently rejected plans. Try more diverse strategies.**
 - **Strategy 2: If simple feature combinations aren't helping, try `create_embedding_features` for complex non-linear relationships.**
@@ -539,8 +556,9 @@ Your response must be a strict JSON list, even for single operations:
                 lgbm = lgb.LGBMRegressor(random_state=42, verbosity=-1)
                 lgbm.fit(X_val, y_val)
                 
+                # 使用MAE作为排列重要性的指标
                 importance_df = calculate_permutation_importance(
-                    model=lgbm, X_val=X_val, y_val=y_val, metric_func=r2_score
+                    model=lgbm, X_val=X_val, y_val=y_val, metric_func=mean_absolute_error, higher_is_better=False
                 )
                 
                 # 2. Get plan with review context
@@ -566,14 +584,14 @@ Your response must be a strict JSON list, even for single operations:
             features_to_probe = [c for c in temp_df.columns if c not in ['date', self.target_col]]
             new_score, _, importances_df = probe_func(temp_df, self.target_col, features_to_probe)
             
-            # 4. Decide whether to adopt new features
-            improvement = new_score - self.best_score
-            adopted = improvement >= self.acceptance_threshold
+            # 4. Decide whether to adopt new features (MAE: lower is better)
+            improvement = self.best_score - new_score
+            adopted = improvement > self.acceptance_threshold # 任何正向改进（MAE降低）都会被接受
             
-            print(f"  - New features '{new_feature_name}', probe R²: {new_score:.4f} (improvement: {improvement:+.4f})")
+            print(f"  - New features '{new_feature_name}', probe MAE: {new_score:.4f} (improvement: {improvement:+.4f})")
 
             if adopted:
-                print(f"  ✅ Adopted: Performance improvement meets threshold {self.acceptance_threshold}")
+                print(f"  ✅ Adopted: Performance improved.")
                 self.best_score = new_score
                 self.best_df = temp_df
                 self.best_plan.append(plan)
@@ -599,7 +617,7 @@ Your response must be a strict JSON list, even for single operations:
 
         print("\n" + "="*80)
         print("🏆 T-LAFS feature search loop completed.")
-        print(f"🏆 Best R² score found: {self.best_score:.4f}")
+        print(f"🏆 Best MAE score found: {self.best_score:.4f}")
         print(f"📋 Final adopted plans: {self.best_plan}")
         print("="*80)
         

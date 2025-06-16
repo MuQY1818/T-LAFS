@@ -7,6 +7,9 @@ import torch
 # from ..models.probe import ProbeForecaster
 # from .mvse import generate_mvse_features_for_tlafs
 
+# 导入新的MVSE特征生成器
+from .mvse_features import create_mvse_features
+
 # 在实际应用中，下面的TLAFS_Algorithm属性需要被正确设置或传入
 # TLAFS_Algorithm.pretrained_encoders = {}
 # TLAFS_Algorithm.embedder_scalers = {}
@@ -218,6 +221,10 @@ def execute_plan(df: pd.DataFrame, plan: list, tlafs_params: dict):
                     print(f"  - ⚠️ Features not found: {cols_to_delete}. Skipping.")
                     continue
 
+            # --- MVSE Probe Features ---
+            elif op == "create_mvse_features":
+                temp_df, step_feature_name = create_mvse_features(temp_df, target_col=target_col, **args)
+            
             elif op == "create_embedding_features":
                 col = args.get("col")
                 window_size = args.get("window_size", 90)

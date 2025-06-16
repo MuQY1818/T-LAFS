@@ -15,7 +15,7 @@ from tlafs.utils.file_utils import save_results # 假设这个函数仍然适用
 from tlafs.analysis.feature_importance import calculate_permutation_importance, analyze_iterative_contribution
 from sklearn.model_selection import train_test_split
 import lightgbm as lgb
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_absolute_error # 导入 mae
 import pandas as pd
 
 def main():
@@ -79,7 +79,8 @@ def main():
         )
 
         if final_metrics:
-            best_final_model_name = max(final_metrics, key=lambda k: final_metrics[k]['r2'])
+            # 核心指标变为MAE，越小越好
+            best_final_model_name = min(final_metrics, key=lambda k: final_metrics[k]['mae'])
             best_final_metrics = final_metrics[best_final_model_name]
             
             # 从final_results中为最佳模型获取日期、真实值和预测值
@@ -136,12 +137,13 @@ def main():
             lgbm_for_importance = lgb.LGBMRegressor(random_state=42)
             lgbm_for_importance.fit(X_train, y_train)
 
-            # 计算排列重要性
+            # 计算排列重要性，使用MAE
             permutation_importance_df = calculate_permutation_importance(
                 model=lgbm_for_importance,
                 X_val=X_val,
                 y_val=y_val,
-                metric_func=r2_score
+                metric_func=mean_absolute_error, # 使用MAE
+                higher_is_better=False # MAE越小越好
             )
             print(permutation_importance_df.to_string())
 
@@ -176,16 +178,16 @@ def main():
                 )
 
                 if final_metrics_pruned:
-                    best_model_name_pruned = max(final_metrics_pruned, key=lambda k: final_metrics_pruned[k]['r2'])
+                    best_model_name_pruned = min(final_metrics_pruned, key=lambda k: final_metrics_pruned[k]['mae'])
                     best_metrics_pruned = final_metrics_pruned[best_model_name_pruned]
-                    r2_pruned = best_metrics_pruned['r2']
+                    mae_pruned = best_metrics_pruned['mae']
                     
                     print(f"\n剪枝后的性能 (最佳模型: {best_model_name_pruned}):")
                     print(f"  - 特征数量: {len(df_pruned.columns) - 2} (从 {len(best_df.columns) - 2} 减少了 {len(features_to_drop)} 个)")
-                    print(f"  - 新的 R² 分数: {r2_pruned:.4f} (原始最佳 R²: {best_final_metrics['r2']:.4f})")
+                    print(f"  - 新的 MAE 分数: {mae_pruned:.4f} (原始最佳 MAE: {best_final_metrics['mae']:.4f})")
 
-                    # 如果性能没有显著下降，使用剪枝后的特征集
-                    if r2_pruned >= best_final_metrics['r2'] - 0.01:  # 允许最多0.01的性能下降
+                    # 如果性能没有显著恶化，使用剪枝后的特征集 (允许MAE最多增加1%)
+                    if mae_pruned <= best_final_metrics['mae'] * 1.01:
                         print("\n✅ 采用剪枝后的特征集。将更新最终结果。")
                         best_df = df_pruned
                         final_metrics = final_metrics_pruned
@@ -225,7 +227,7 @@ def main():
 
             summary_data = {
                 "probe_model": probe_name_for_reporting,
-                "best_score_during_search": best_score_during_search,
+                "best_score_during_search": best_score_during_search, # 这是在搜索过程中的最佳MAE
                 "best_feature_plan": best_feature_plan,
                 "final_features": [col for col in best_df.columns if col not in ['date', TARGET_COL]],
                 "final_validation_scores_all_models": final_metrics,
