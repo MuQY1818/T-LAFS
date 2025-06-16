@@ -1,3 +1,4 @@
+# baseline_model_comparison.py 用于对比不同模型在不做特征工程的情况下，直接对原始数据进行训练和预测的效果
 import pandas as pd
 import numpy as np
 import lightgbm as lgb

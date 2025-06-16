@@ -1,0 +1,6 @@
+step,feature_name,marginal_contribution,cumulative_performance
+1,"time_features_macro_set, lag_features_macro_set_on_temp, rolling_features_macro_set_on_temp",0.6988604298437756,0.6988604298437756
+4,"temp_lag_1_x_temp_rolling_std_30, temp_lag_90, temp_rolling_mean_60",0.01097095029447015,0.7064523110600884
+5,"temp_lag_2_x_temp_rolling_std_7, temp_rolling_mean_90",0.0022999987579961356,0.7087523098180846
+2,"temp_lag_365, temp_lag_1_x_temp_rolling_mean_30",0.0009551760062013193,0.6998156058499769
+3,"embed_0_win365, temp_lag_90",-0.0043342450843586455,0.6954813607656183

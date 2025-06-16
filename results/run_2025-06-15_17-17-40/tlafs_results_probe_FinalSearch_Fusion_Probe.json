@@ -1,0 +1,606 @@
+{
+    "run_mode": "search",
+    "source_plan_file": "N/A",
+    "probe_model": "FinalSearch_Fusion_Probe",
+    "best_score_during_search": 0.7199783189467408,
+    "best_feature_plan": [
+        {
+            "operation": "create_lag",
+            "on": "temp",
+            "days": 1,
+            "id": "lag1"
+        },
+        {
+            "operation": "create_interaction",
+            "features": [
+                "temp_lag1_rollmean7",
+                "weekofyear"
+            ],
+            "id": "temp_lag1_rollmean7_weekofyear_interact"
+        },
+        {
+            "operation": "create_rolling_std",
+            "on": "temp_lag1",
+            "window": 7,
+            "id": "temp_lag1_rollstd7"
+        }
+    ],
+    "final_features": [
+        "dayofweek",
+        "month",
+        "weekofyear",
+        "is_weekend",
+        "temp_lag1",
+        "temp_lag1_rollstd7"
+    ],
+    "final_validation_scores": {
+        "LightGBM": {
+            "r2": 0.7086966177141327,
+            "mae": 1.7609478529722022,
+            "rmse": 2.2149234042496495
+        },
+        "RandomForest": {
+            "r2": 0.6907804885169921,
+            "mae": 1.8185164383561645,
+            "rmse": 2.2820197221603427
+        },
+        "XGBoost": {
+            "r2": 0.648771518236265,
+            "mae": 1.9227377855900214,
+            "rmse": 2.432096550647555
+        },
+        "CatBoost": {
+            "r2": 0.7026317665339926,
+            "mae": 1.7665861855312601,
+            "rmse": 2.237861655948741
+        },
+        "SVR": {
+            "r2": 0.7116056127513779,
+            "mae": 1.7246070402458142,
+            "rmse": 2.2038363931209255
+        },
+        "Ridge": {
+            "r2": 0.6648878808360578,
+            "mae": 1.8963056275444967,
+            "rmse": 2.3756421144515696
+        },
+        "Lasso": {
+            "r2": -0.007695433761665482,
+            "mae": 3.398793769938075,
+            "rmse": 4.119557735874156
+        },
+        "KNeighbors": {
+            "r2": 0.6530951689268844,
+            "mae": 1.933150684931507,
+            "rmse": 2.4170805439960796
+        },
+        "TabNet": {
+            "r2": 0.6633461690984404,
+            "mae": 1.888143725460523,
+            "rmse": 2.38110051525391
+        },
+        "SimpleNN": {
+            "r2": 0.7249117808947367,
+            "mae": 1.6865703851882725,
+            "rmse": 2.152394851087672
+        },
+        "EnhancedNN": {
+            "r2": 0.6961381813349934,
+            "mae": 1.796279359386392,
+            "rmse": 2.262163626289326
+        },
+        "Transformer": {
+            "r2": 0.7212156195532322,
+            "mae": 1.694484236730288,
+            "rmse": 2.1668066883128834
+        }
+    },
+    "best_final_model": {
+        "name": "SimpleNN",
+        "metrics": {
+            "r2": 0.7249117808947367,
+            "mae": 1.6865703851882725,
+            "rmse": 2.152394851087672
+        }
+    },
+    "run_history": [
+        {
+            "iteration": 1,
+            "plan": [
+                {
+                    "operation": "create_rolling_mean",
+                    "on": "temp_lag1",
+                    "window": 7,
+                    "id": "temp_lag1_rollmean_7"
+                },
+                {
+                    "operation": "create_interaction",
+                    "features": [
+                        "temp_lag1",
+                        "weekofyear"
+                    ],
+                    "id": "temp_lag1_x_weekofyear"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7097452987698232,
+                "r2_lgbm": 0.7161284280310996,
+                "r2_nn": 0.7033621695085468,
+                "num_features": 7,
+                "importances": {
+                    "dayofweek": 142,
+                    "month": 69,
+                    "weekofyear": 201,
+                    "is_weekend": 0,
+                    "temp_lag1": 351,
+                    "temp_lag1_rollmean_7": 385,
+                    "temp_lag1_x_weekofyear_temp_lag1_x_weekofyear": 352
+                }
+            },
+            "adopted": false,
+            "reward": -0.0064098840570715465
+        },
+        {
+            "iteration": 2,
+            "plan": [
+                {
+                    "operation": "create_rolling_mean",
+                    "on": "temp_lag1",
+                    "window": 7,
+                    "id": "temp_lag1_rollmean7"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7137488719066961,
+                "r2_lgbm": 0.7133720528151073,
+                "r2_nn": 0.7141256909982849,
+                "num_features": 6,
+                "importances": {
+                    "dayofweek": 159,
+                    "month": 96,
+                    "weekofyear": 332,
+                    "is_weekend": 0,
+                    "temp_lag1": 438,
+                    "temp_lag1_rollmean7": 475
+                }
+            },
+            "adopted": true,
+            "reward": -0.0024063109201986066
+        },
+        {
+            "iteration": 3,
+            "plan": [
+                {
+                    "operation": "create_interaction",
+                    "features": [
+                        "temp_lag1_rollmean7",
+                        "weekofyear"
+                    ],
+                    "id": "temp_lag1_rollmean7_weekofyear_interact"
+                },
+                {
+                    "operation": "create_rolling_std",
+                    "on": "temp_lag1",
+                    "window": 7,
+                    "id": "temp_lag1_rollstd7"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7199783189467408,
+                "r2_lgbm": 0.718435916778962,
+                "r2_nn": 0.7215207211145195,
+                "num_features": 6,
+                "importances": {
+                    "dayofweek": 166,
+                    "month": 103,
+                    "weekofyear": 318,
+                    "is_weekend": 0,
+                    "temp_lag1": 445,
+                    "temp_lag1_rollstd7": 468
+                }
+            },
+            "adopted": true,
+            "reward": 0.0038231361198460823
+        },
+        {
+            "iteration": 4,
+            "plan": [
+                {
+                    "operation": "create_interaction",
+                    "features": [
+                        "temp_lag1_rollstd7",
+                        "weekofyear"
+                    ],
+                    "id": "temp_lag1_rollstd7_x_weekofyear"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7072827278626956,
+                "r2_lgbm": 0.7184738363233079,
+                "r2_nn": 0.6960916194020835,
+                "num_features": 7,
+                "importances": {
+                    "dayofweek": 142,
+                    "month": 83,
+                    "weekofyear": 272,
+                    "is_weekend": 0,
+                    "temp_lag1": 363,
+                    "temp_lag1_rollstd7": 338,
+                    "temp_lag1_rollstd7_x_weekofyear_temp_lag1_rollstd7_x_weekofyear": 302
+                }
+            },
+            "adopted": false,
+            "reward": -0.012695591084045166
+        },
+        {
+            "iteration": 5,
+            "plan": [
+                {
+                    "operation": "create_learned_embedding",
+                    "window": 365,
+                    "id": "weekofyear_embedding_365"
+                },
+                {
+                    "operation": "create_interaction",
+                    "features": [
+                        "temp_lag1",
+                        "weekofyear_embedding_365"
+                    ],
+                    "id": "temp_lag1_x_weekofyear_embed"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.707640099857495,
+                "r2_lgbm": 0.7014487054864933,
+                "r2_nn": 0.7138314942284967,
+                "num_features": 70,
+                "importances": {
+                    "dayofweek": 40,
+                    "month": 28,
+                    "weekofyear": 79,
+                    "is_weekend": 0,
+                    "temp_lag1": 218,
+                    "temp_lag1_rollstd7": 169,
+                    "embed_0_weekofyear_embedding_365": 18,
+                    "embed_1_weekofyear_embedding_365": 10,
+                    "embed_2_weekofyear_embedding_365": 27,
+                    "embed_3_weekofyear_embedding_365": 42,
+                    "embed_4_weekofyear_embedding_365": 6,
+                    "embed_5_weekofyear_embedding_365": 13,
+                    "embed_6_weekofyear_embedding_365": 8,
+                    "embed_7_weekofyear_embedding_365": 13,
+                    "embed_8_weekofyear_embedding_365": 4,
+                    "embed_9_weekofyear_embedding_365": 19,
+                    "embed_10_weekofyear_embedding_365": 24,
+                    "embed_11_weekofyear_embedding_365": 9,
+                    "embed_12_weekofyear_embedding_365": 8,
+                    "embed_13_weekofyear_embedding_365": 18,
+                    "embed_14_weekofyear_embedding_365": 32,
+                    "embed_15_weekofyear_embedding_365": 4,
+                    "embed_16_weekofyear_embedding_365": 14,
+                    "embed_17_weekofyear_embedding_365": 12,
+                    "embed_18_weekofyear_embedding_365": 26,
+                    "embed_19_weekofyear_embedding_365": 1,
+                    "embed_20_weekofyear_embedding_365": 16,
+                    "embed_21_weekofyear_embedding_365": 20,
+                    "embed_22_weekofyear_embedding_365": 4,
+                    "embed_23_weekofyear_embedding_365": 19,
+                    "embed_24_weekofyear_embedding_365": 19,
+                    "embed_25_weekofyear_embedding_365": 20,
+                    "embed_26_weekofyear_embedding_365": 6,
+                    "embed_27_weekofyear_embedding_365": 0,
+                    "embed_28_weekofyear_embedding_365": 28,
+                    "embed_29_weekofyear_embedding_365": 7,
+                    "embed_30_weekofyear_embedding_365": 18,
+                    "embed_31_weekofyear_embedding_365": 25,
+                    "embed_32_weekofyear_embedding_365": 22,
+                    "embed_33_weekofyear_embedding_365": 12,
+                    "embed_34_weekofyear_embedding_365": 18,
+                    "embed_35_weekofyear_embedding_365": 6,
+                    "embed_36_weekofyear_embedding_365": 31,
+                    "embed_37_weekofyear_embedding_365": 13,
+                    "embed_38_weekofyear_embedding_365": 3,
+                    "embed_39_weekofyear_embedding_365": 12,
+                    "embed_40_weekofyear_embedding_365": 16,
+                    "embed_41_weekofyear_embedding_365": 4,
+                    "embed_42_weekofyear_embedding_365": 9,
+                    "embed_43_weekofyear_embedding_365": 4,
+                    "embed_44_weekofyear_embedding_365": 12,
+                    "embed_45_weekofyear_embedding_365": 21,
+                    "embed_46_weekofyear_embedding_365": 8,
+                    "embed_47_weekofyear_embedding_365": 8,
+                    "embed_48_weekofyear_embedding_365": 24,
+                    "embed_49_weekofyear_embedding_365": 32,
+                    "embed_50_weekofyear_embedding_365": 8,
+                    "embed_51_weekofyear_embedding_365": 15,
+                    "embed_52_weekofyear_embedding_365": 11,
+                    "embed_53_weekofyear_embedding_365": 16,
+                    "embed_54_weekofyear_embedding_365": 22,
+                    "embed_55_weekofyear_embedding_365": 1,
+                    "embed_56_weekofyear_embedding_365": 8,
+                    "embed_57_weekofyear_embedding_365": 3,
+                    "embed_58_weekofyear_embedding_365": 36,
+                    "embed_59_weekofyear_embedding_365": 27,
+                    "embed_60_weekofyear_embedding_365": 9,
+                    "embed_61_weekofyear_embedding_365": 29,
+                    "embed_62_weekofyear_embedding_365": 19,
+                    "embed_63_weekofyear_embedding_365": 17
+                }
+            },
+            "adopted": false,
+            "reward": -0.012338219089245817
+        },
+        {
+            "iteration": 6,
+            "plan": [
+                {
+                    "operation": "create_interaction",
+                    "features": [
+                        "temp_lag1_rollstd7",
+                        "temp_lag1"
+                    ],
+                    "id": "temp_rollstd7_lag1_interaction"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7163288866135338,
+                "r2_lgbm": 0.7150491168480355,
+                "r2_nn": 0.717608656379032,
+                "num_features": 7,
+                "importances": {
+                    "dayofweek": 161,
+                    "month": 111,
+                    "weekofyear": 293,
+                    "is_weekend": 0,
+                    "temp_lag1": 337,
+                    "temp_lag1_rollstd7": 311,
+                    "temp_lag1_rollstd7_x_temp_lag1_temp_rollstd7_lag1_interaction": 287
+                }
+            },
+            "adopted": true,
+            "reward": -0.0036494323332070255
+        },
+        {
+            "iteration": 7,
+            "plan": [
+                {
+                    "operation": "create_learned_embedding",
+                    "window": 365,
+                    "id": "temp_embedding_365"
+                },
+                {
+                    "operation": "create_interaction",
+                    "features": [
+                        "temp_lag1",
+                        "temp_embedding_365"
+                    ],
+                    "id": "temp_lag1_x_temp_embedding_365_interaction"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7068189696777937,
+                "r2_lgbm": 0.7014487054864933,
+                "r2_nn": 0.712189233869094,
+                "num_features": 70,
+                "importances": {
+                    "dayofweek": 40,
+                    "month": 28,
+                    "weekofyear": 79,
+                    "is_weekend": 0,
+                    "temp_lag1": 218,
+                    "temp_lag1_rollstd7": 169,
+                    "embed_0_temp_embedding_365": 18,
+                    "embed_1_temp_embedding_365": 10,
+                    "embed_2_temp_embedding_365": 27,
+                    "embed_3_temp_embedding_365": 42,
+                    "embed_4_temp_embedding_365": 6,
+                    "embed_5_temp_embedding_365": 13,
+                    "embed_6_temp_embedding_365": 8,
+                    "embed_7_temp_embedding_365": 13,
+                    "embed_8_temp_embedding_365": 4,
+                    "embed_9_temp_embedding_365": 19,
+                    "embed_10_temp_embedding_365": 24,
+                    "embed_11_temp_embedding_365": 9,
+                    "embed_12_temp_embedding_365": 8,
+                    "embed_13_temp_embedding_365": 18,
+                    "embed_14_temp_embedding_365": 32,
+                    "embed_15_temp_embedding_365": 4,
+                    "embed_16_temp_embedding_365": 14,
+                    "embed_17_temp_embedding_365": 12,
+                    "embed_18_temp_embedding_365": 26,
+                    "embed_19_temp_embedding_365": 1,
+                    "embed_20_temp_embedding_365": 16,
+                    "embed_21_temp_embedding_365": 20,
+                    "embed_22_temp_embedding_365": 4,
+                    "embed_23_temp_embedding_365": 19,
+                    "embed_24_temp_embedding_365": 19,
+                    "embed_25_temp_embedding_365": 20,
+                    "embed_26_temp_embedding_365": 6,
+                    "embed_27_temp_embedding_365": 0,
+                    "embed_28_temp_embedding_365": 28,
+                    "embed_29_temp_embedding_365": 7,
+                    "embed_30_temp_embedding_365": 18,
+                    "embed_31_temp_embedding_365": 25,
+                    "embed_32_temp_embedding_365": 22,
+                    "embed_33_temp_embedding_365": 12,
+                    "embed_34_temp_embedding_365": 18,
+                    "embed_35_temp_embedding_365": 6,
+                    "embed_36_temp_embedding_365": 31,
+                    "embed_37_temp_embedding_365": 13,
+                    "embed_38_temp_embedding_365": 3,
+                    "embed_39_temp_embedding_365": 12,
+                    "embed_40_temp_embedding_365": 16,
+                    "embed_41_temp_embedding_365": 4,
+                    "embed_42_temp_embedding_365": 9,
+                    "embed_43_temp_embedding_365": 4,
+                    "embed_44_temp_embedding_365": 12,
+                    "embed_45_temp_embedding_365": 21,
+                    "embed_46_temp_embedding_365": 8,
+                    "embed_47_temp_embedding_365": 8,
+                    "embed_48_temp_embedding_365": 24,
+                    "embed_49_temp_embedding_365": 32,
+                    "embed_50_temp_embedding_365": 8,
+                    "embed_51_temp_embedding_365": 15,
+                    "embed_52_temp_embedding_365": 11,
+                    "embed_53_temp_embedding_365": 16,
+                    "embed_54_temp_embedding_365": 22,
+                    "embed_55_temp_embedding_365": 1,
+                    "embed_56_temp_embedding_365": 8,
+                    "embed_57_temp_embedding_365": 3,
+                    "embed_58_temp_embedding_365": 36,
+                    "embed_59_temp_embedding_365": 27,
+                    "embed_60_temp_embedding_365": 9,
+                    "embed_61_temp_embedding_365": 29,
+                    "embed_62_temp_embedding_365": 19,
+                    "embed_63_temp_embedding_365": 17
+                }
+            },
+            "adopted": false,
+            "reward": -0.01315934926894713
+        },
+        {
+            "iteration": 8,
+            "plan": [
+                {
+                    "operation": "create_mvse_features"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7133156834895504,
+                "r2_lgbm": 0.7072371328245506,
+                "r2_nn": 0.7193942341545504,
+                "num_features": 30,
+                "importances": {
+                    "dayofweek": 70,
+                    "month": 2,
+                    "weekofyear": 18,
+                    "is_weekend": 0,
+                    "temp_lag1": 252,
+                    "temp_lag1_rollstd7": 211,
+                    "mvse_feat_0": 53,
+                    "mvse_feat_1": 63,
+                    "mvse_feat_2": 39,
+                    "mvse_feat_3": 40,
+                    "mvse_feat_4": 51,
+                    "mvse_feat_5": 40,
+                    "mvse_feat_6": 14,
+                    "mvse_feat_7": 27,
+                    "mvse_feat_8": 58,
+                    "mvse_feat_9": 30,
+                    "mvse_feat_10": 34,
+                    "mvse_feat_11": 34,
+                    "mvse_feat_12": 26,
+                    "mvse_feat_13": 38,
+                    "mvse_feat_14": 49,
+                    "mvse_feat_15": 45,
+                    "mvse_gap_mean": 29,
+                    "mvse_gap_std": 12,
+                    "mvse_gap_max": 5,
+                    "mvse_gap_min": 110,
+                    "mvse_gmp_mean": 46,
+                    "mvse_gmp_std": 47,
+                    "mvse_gmp_max": 0,
+                    "mvse_gmp_min": 57
+                }
+            },
+            "adopted": false,
+            "reward": -0.006662635457190369
+        },
+        {
+            "iteration": 9,
+            "plan": [
+                {
+                    "operation": "create_mvse_features"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7126597857348969,
+                "r2_lgbm": 0.7046084753245463,
+                "r2_nn": 0.7207110961452475,
+                "num_features": 30,
+                "importances": {
+                    "dayofweek": 73,
+                    "month": 1,
+                    "weekofyear": 15,
+                    "is_weekend": 0,
+                    "temp_lag1": 241,
+                    "temp_lag1_rollstd7": 199,
+                    "mvse_feat_0": 47,
+                    "mvse_feat_1": 26,
+                    "mvse_feat_2": 70,
+                    "mvse_feat_3": 48,
+                    "mvse_feat_4": 23,
+                    "mvse_feat_5": 69,
+                    "mvse_feat_6": 16,
+                    "mvse_feat_7": 41,
+                    "mvse_feat_8": 71,
+                    "mvse_feat_9": 14,
+                    "mvse_feat_10": 27,
+                    "mvse_feat_11": 56,
+                    "mvse_feat_12": 34,
+                    "mvse_feat_13": 31,
+                    "mvse_feat_14": 44,
+                    "mvse_feat_15": 31,
+                    "mvse_gap_mean": 27,
+                    "mvse_gap_std": 21,
+                    "mvse_gap_max": 15,
+                    "mvse_gap_min": 124,
+                    "mvse_gmp_mean": 44,
+                    "mvse_gmp_std": 41,
+                    "mvse_gmp_max": 0,
+                    "mvse_gmp_min": 51
+                }
+            },
+            "adopted": false,
+            "reward": -0.007318533211843947
+        },
+        {
+            "iteration": 10,
+            "plan": [
+                {
+                    "operation": "create_mvse_features"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7163022731149638,
+                "r2_lgbm": 0.7064726698448414,
+                "r2_nn": 0.7261318763850861,
+                "num_features": 30,
+                "importances": {
+                    "dayofweek": 74,
+                    "month": 2,
+                    "weekofyear": 18,
+                    "is_weekend": 0,
+                    "temp_lag1": 226,
+                    "temp_lag1_rollstd7": 206,
+                    "mvse_feat_0": 59,
+                    "mvse_feat_1": 79,
+                    "mvse_feat_2": 92,
+                    "mvse_feat_3": 24,
+                    "mvse_feat_4": 7,
+                    "mvse_feat_5": 27,
+                    "mvse_feat_6": 21,
+                    "mvse_feat_7": 41,
+                    "mvse_feat_8": 10,
+                    "mvse_feat_9": 15,
+                    "mvse_feat_10": 24,
+                    "mvse_feat_11": 27,
+                    "mvse_feat_12": 63,
+                    "mvse_feat_13": 35,
+                    "mvse_feat_14": 26,
+                    "mvse_feat_15": 69,
+                    "mvse_gap_mean": 25,
+                    "mvse_gap_std": 21,
+                    "mvse_gap_max": 6,
+                    "mvse_gap_min": 152,
+                    "mvse_gmp_mean": 54,
+                    "mvse_gmp_std": 53,
+                    "mvse_gmp_max": 0,
+                    "mvse_gmp_min": 44
+                }
+            },
+            "adopted": true,
+            "reward": -0.003676045831777053
+        }
+    ]
+}

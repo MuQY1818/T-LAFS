@@ -1,0 +1,6 @@
+step,feature_name,marginal_contribution,cumulative_performance
+1,"time_features_macro_set, temp_lag_365, fourier_features_order_10",0.5210548143601563,0.5210548143601563
+2,"lag_features_macro_set_on_temp, rolling_features_macro_set_on_temp",0.17929760860434496,0.7003524229645013
+5,"deleted_15_features, temp_rolling_std_180",0.0125833010935128,0.7148156919276418
+4,"deleted_6_features, temp_rolling_std_90",0.008950362189008243,0.702232390834129
+3,"temp_lag_1_x_month, temp_lag_365_x_dayofweek, embed_0_win365",-0.007070394319380502,0.6932820286451208

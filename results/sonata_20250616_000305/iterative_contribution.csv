@@ -1,0 +1,6 @@
+step,feature_name,marginal_contribution,cumulative_performance
+1,"time_features_macro_set, lag_features_macro_set_on_temp",0.7022342512833046,0.7022342512833046
+5,"temp_lag_2_x_month, temp_lag_2_x_dayofweek",0.008891162127958152,0.7076114218510827
+3,"temp_lag_1_x_dayofweek, temp_lag_1_x_month",0.0068807667999039035,0.7057411966436795
+2,rolling_features_macro_set_on_temp,-0.0033738214395290234,0.6988604298437756
+4,"deleted_2_features, temp_lag_1_x_temp_lag_2",-0.007020936920554943,0.6987202597231246

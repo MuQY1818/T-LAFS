@@ -1,0 +1,238 @@
+{
+    "probe_model": "Sonata_Transformer_Specialist",
+    "best_score_during_search": 1.7309752724361183,
+    "best_feature_plan": [
+        [
+            {
+                "function": "create_time_features_macro",
+                "args": {}
+            },
+            {
+                "function": "create_lag_features_macro",
+                "args": {
+                    "col": "temp"
+                }
+            }
+        ],
+        [
+            {
+                "function": "create_rolling_features",
+                "args": {
+                    "col": "temp",
+                    "windows": [
+                        7
+                    ],
+                    "aggs": [
+                        "mean"
+                    ]
+                }
+            },
+            {
+                "function": "create_embedding_features",
+                "args": {
+                    "col": "dayofweek",
+                    "window_size": 7
+                }
+            }
+        ]
+    ],
+    "final_features": [
+        "year",
+        "month",
+        "day",
+        "dayofweek",
+        "temp_lag_1",
+        "temp_lag_2",
+        "temp_lag_3",
+        "temp_lag_7",
+        "temp_lag_14",
+        "temp_rolling_mean_7"
+    ],
+    "final_validation_scores_all_models": {
+        "LightGBM": {
+            "mse": 4.919354309379555,
+            "rmse": 2.2179617465996917,
+            "mae": 1.7309752724361183,
+            "r2": 0.7078968731636208,
+            "mape": 21.066957976454283
+        },
+        "SimpleNN": {
+            "mse": 5.124501419358741,
+            "rmse": 2.263736163813871,
+            "mae": 1.7922157474413312,
+            "r2": 0.6957155768963217,
+            "mape": 23.236971482740312
+        },
+        "EnhancedNN": {
+            "mse": 5.0402194219566905,
+            "rmse": 2.2450433006863566,
+            "mae": 1.7694814591865016,
+            "r2": 0.7007201025777132,
+            "mape": 20.86142322202979
+        },
+        "Transformer": {
+            "mse": 5.11370866302705,
+            "rmse": 2.2613510702734883,
+            "mae": 1.7808762920066104,
+            "r2": 0.6963564329260773,
+            "mape": 22.682320874305223
+        }
+    },
+    "best_final_model": {
+        "name": "LightGBM",
+        "metrics": {
+            "mse": 4.919354309379555,
+            "rmse": 2.2179617465996917,
+            "mae": 1.7309752724361183,
+            "r2": 0.7078968731636208,
+            "mape": 21.066957976454283
+        }
+    },
+    "run_history": [
+        {
+            "iteration": 0,
+            "plan": "Baseline",
+            "feature_name": "Baseline",
+            "performance": 3.398793769938075,
+            "adopted": true,
+            "available_features": [],
+            "importances": "Empty DataFrame\nColumns: []\nIndex: []"
+        },
+        {
+            "iteration": 1,
+            "plan": "[{'function': 'create_time_features_macro', 'args': {}}, {'function': 'create_lag_features_macro', 'args': {'col': 'temp'}}]",
+            "feature_name": "time_features_macro_set, lag_features_macro_set_on_temp",
+            "performance": 1.7591879234920584,
+            "adopted": "True",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14"
+            ],
+            "importances": "       feature  importance\n0   temp_lag_2         471\n1   temp_lag_1         456\n2  temp_lag_14         448\n3   temp_lag_3         391\n4   temp_lag_7         381\n5          day         287\n6        month         280\n7         year         158\n8    dayofweek         128"
+        },
+        {
+            "iteration": 2,
+            "plan": "[{'function': 'create_rolling_features_macro', 'args': {'col': 'temp'}}]",
+            "feature_name": "rolling_features_macro_set_on_temp",
+            "performance": 1.779691155857507,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14"
+            ],
+            "importances": "       feature  importance\n0   temp_lag_2         471\n1   temp_lag_1         456\n2  temp_lag_14         448\n3   temp_lag_3         391\n4   temp_lag_7         381\n5          day         287\n6        month         280\n7         year         158\n8    dayofweek         128"
+        },
+        {
+            "iteration": 3,
+            "plan": "[{'function': 'create_interaction_features', 'args': {'col1': 'temp_lag_2', 'col2': 'dayofweek'}}, {'function': 'create_embedding_features', 'args': {'col': 'temp_lag_2', 'window_size': 90}}]",
+            "feature_name": "temp_lag_2_x_dayofweek, embed_0_win90",
+            "performance": 1.7864921590599614,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14"
+            ],
+            "importances": "       feature  importance\n0   temp_lag_2         471\n1   temp_lag_1         456\n2  temp_lag_14         448\n3   temp_lag_3         391\n4   temp_lag_7         381\n5          day         287\n6        month         280\n7         year         158\n8    dayofweek         128"
+        },
+        {
+            "iteration": 4,
+            "plan": "[{'function': 'create_rolling_features', 'args': {'col': 'temp_lag_1', 'windows': [7, 14], 'aggs': ['mean', 'std']}}, {'function': 'create_embedding_features', 'args': {'col': 'month', 'window_size': 365}}]",
+            "feature_name": "temp_lag_1_rolling_std_14, embed_0_win365",
+            "performance": 1.798273676864539,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14"
+            ],
+            "importances": "       feature  importance\n0   temp_lag_2         471\n1   temp_lag_1         456\n2  temp_lag_14         448\n3   temp_lag_3         391\n4   temp_lag_7         381\n5          day         287\n6        month         280\n7         year         158\n8    dayofweek         128"
+        },
+        {
+            "iteration": 5,
+            "plan": "[{'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [7], 'aggs': ['mean']}}, {'function': 'create_embedding_features', 'args': {'col': 'dayofweek', 'window_size': 7}}]",
+            "feature_name": "temp_rolling_mean_7",
+            "performance": 1.7309752724361183,
+            "adopted": "True",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7"
+            ],
+            "importances": "               feature  importance\n0           temp_lag_1         452\n1           temp_lag_2         431\n2          temp_lag_14         402\n3  temp_rolling_mean_7         337\n4           temp_lag_3         328\n5           temp_lag_7         305\n6                month         245\n7                  day         232\n8                 year         150\n9            dayofweek         118"
+        },
+        {
+            "iteration": 6,
+            "plan": "[{'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [14], 'aggs': ['mean', 'std']}}, {'function': 'create_interaction_features', 'args': {'col1': 'temp_rolling_mean_7', 'col2': 'dayofweek'}}]",
+            "feature_name": "temp_rolling_std_14, temp_rolling_mean_7_x_dayofweek",
+            "performance": 1.7483971453162523,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7"
+            ],
+            "importances": "               feature  importance\n0           temp_lag_1         452\n1           temp_lag_2         431\n2          temp_lag_14         402\n3  temp_rolling_mean_7         337\n4           temp_lag_3         328\n5           temp_lag_7         305\n6                month         245\n7                  day         232\n8                 year         150\n9            dayofweek         118"
+        },
+        {
+            "iteration": 7,
+            "plan": "[{'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [30], 'aggs': ['mean']}}, {'function': 'create_lag_features', 'args': {'col': 'temp', 'lags': [365]}}]",
+            "feature_name": "temp_rolling_mean_30, temp_lag_365",
+            "performance": 1.745678023756754,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7"
+            ],
+            "importances": "               feature  importance\n0           temp_lag_1         452\n1           temp_lag_2         431\n2          temp_lag_14         402\n3  temp_rolling_mean_7         337\n4           temp_lag_3         328\n5           temp_lag_7         305\n6                month         245\n7                  day         232\n8                 year         150\n9            dayofweek         118"
+        }
+    ]
+}

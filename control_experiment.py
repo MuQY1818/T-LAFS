@@ -1,3 +1,4 @@
+# 对照组实验，使用人工编写的静态特征，不使用T-LAFS，直接对原始数据进行训练和预测
 import pandas as pd
 import numpy as np
 import lightgbm as lgb

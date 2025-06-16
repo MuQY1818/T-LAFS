@@ -1,0 +1,375 @@
+{
+    "probe_model": "Sonata_Transformer_Specialist",
+    "best_score_during_search": 1.7766110032186124,
+    "best_feature_plan": [
+        [
+            {
+                "function": "create_time_features_macro",
+                "args": {}
+            },
+            {
+                "function": "create_lag_features_macro",
+                "args": {
+                    "col": "temp"
+                }
+            },
+            {
+                "function": "create_rolling_features_macro",
+                "args": {
+                    "col": "temp"
+                }
+            }
+        ],
+        [
+            {
+                "function": "create_fourier_features",
+                "args": {
+                    "col": "date",
+                    "order": 4
+                }
+            },
+            {
+                "function": "create_lag_features",
+                "args": {
+                    "col": "temp",
+                    "lags": [
+                        365
+                    ]
+                }
+            },
+            {
+                "function": "create_rolling_features",
+                "args": {
+                    "col": "temp",
+                    "windows": [
+                        90
+                    ],
+                    "aggs": [
+                        "mean",
+                        "std"
+                    ]
+                }
+            }
+        ]
+    ],
+    "final_features": [
+        "year",
+        "month",
+        "day",
+        "dayofweek",
+        "temp_lag_1",
+        "temp_lag_2",
+        "temp_lag_3",
+        "temp_lag_7",
+        "temp_lag_14",
+        "temp_rolling_mean_7",
+        "temp_rolling_std_7",
+        "temp_rolling_mean_14",
+        "temp_rolling_std_14",
+        "temp_rolling_mean_30",
+        "temp_rolling_std_30",
+        "fourier_sin_1",
+        "fourier_cos_1",
+        "fourier_sin_2",
+        "fourier_cos_2",
+        "fourier_sin_3",
+        "fourier_cos_3",
+        "fourier_sin_4",
+        "fourier_cos_4",
+        "temp_lag_365",
+        "temp_rolling_mean_90",
+        "temp_rolling_std_90"
+    ],
+    "final_validation_scores_all_models": {
+        "LightGBM": {
+            "mse": 5.085621868969157,
+            "rmse": 2.255132339568824,
+            "mae": 1.7766110032186124,
+            "r2": 0.6980241803276981,
+            "mape": 20.761754131450147
+        },
+        "SimpleNN": {
+            "mse": 5.319706524530255,
+            "rmse": 2.3064488991803516,
+            "mae": 1.8218727441030003,
+            "r2": 0.6841246204396368,
+            "mape": 24.072024466330777
+        },
+        "EnhancedNN": {
+            "mse": 4.694404631751352,
+            "rmse": 2.166657479102627,
+            "mae": 1.7019415241398224,
+            "r2": 0.7212540131628173,
+            "mape": 20.995392980957398
+        },
+        "Transformer": {
+            "mse": 5.88219177283116,
+            "rmse": 2.4253230244301807,
+            "mae": 1.8995496322684091,
+            "r2": 0.6507251762250252,
+            "mape": 22.55167934424773
+        }
+    },
+    "best_final_model": {
+        "name": "EnhancedNN",
+        "metrics": {
+            "mse": 4.694404631751352,
+            "rmse": 2.166657479102627,
+            "mae": 1.7019415241398224,
+            "r2": 0.7212540131628173,
+            "mape": 20.995392980957398
+        }
+    },
+    "run_history": [
+        {
+            "iteration": 0,
+            "plan": "Baseline",
+            "feature_name": "Baseline",
+            "performance": 3.398793769938075,
+            "adopted": true,
+            "available_features": [],
+            "importances": "Empty DataFrame\nColumns: []\nIndex: []"
+        },
+        {
+            "iteration": 1,
+            "plan": "[{'function': 'create_time_features_macro', 'args': {}}, {'function': 'create_lag_features_macro', 'args': {'col': 'temp'}}, {'function': 'create_rolling_features_macro', 'args': {'col': 'temp'}}]",
+            "feature_name": "time_features_macro_set, lag_features_macro_set_on_temp, rolling_features_macro_set_on_temp",
+            "performance": 1.779691155857507,
+            "adopted": "True",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30"
+            ],
+            "importances": "                 feature  importance\n0             temp_lag_1         327\n1             temp_lag_2         309\n2            temp_lag_14         275\n3    temp_rolling_std_30         235\n4   temp_rolling_mean_30         215\n5             temp_lag_3         209\n6    temp_rolling_mean_7         197\n7    temp_rolling_std_14         195\n8     temp_rolling_std_7         193\n9   temp_rolling_mean_14         181\n10            temp_lag_7         176\n11                 month         156\n12                   day         143\n13             dayofweek         105\n14                  year          84"
+        },
+        {
+            "iteration": 2,
+            "plan": "[{'function': 'create_fourier_features', 'args': {'col': 'date', 'order': 4}}, {'function': 'create_lag_features', 'args': {'col': 'temp', 'lags': [365]}}, {'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [90], 'aggs': ['mean', 'std']}}]",
+            "feature_name": "fourier_features_order_4, temp_lag_365, temp_rolling_std_90",
+            "performance": 1.7766110032186124,
+            "adopted": "True",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3",
+                "fourier_sin_4",
+                "fourier_cos_4",
+                "temp_lag_365",
+                "temp_rolling_mean_90",
+                "temp_rolling_std_90"
+            ],
+            "importances": "                 feature  importance\n0             temp_lag_1         268\n1             temp_lag_2         223\n2            temp_lag_14         190\n3           temp_lag_365         169\n4    temp_rolling_mean_7         169\n5    temp_rolling_std_90         160\n6             temp_lag_3         155\n7    temp_rolling_std_30         144\n8   temp_rolling_mean_90         136\n9    temp_rolling_std_14         136\n10         fourier_cos_1         133\n11    temp_rolling_std_7         124\n12            temp_lag_7         122\n13  temp_rolling_mean_14         105\n14  temp_rolling_mean_30          96\n15         fourier_sin_4          95\n16         fourier_sin_2          86\n17                   day          83\n18             dayofweek          77\n19         fourier_cos_4          71\n20         fourier_sin_1          62\n21         fourier_sin_3          58\n22         fourier_cos_3          55\n23                  year          51\n24         fourier_cos_2          25\n25                 month           7"
+        },
+        {
+            "iteration": 3,
+            "plan": "[{'function': 'create_mvse_features', 'args': {'hist_len': 90, 'num_lags': 14}}, {'function': 'create_embedding_features', 'args': {'col': 'temp', 'window_size': 365}}]",
+            "feature_name": "mvse_features, embed_0_win365",
+            "performance": 1.8240120501125063,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3",
+                "fourier_sin_4",
+                "fourier_cos_4",
+                "temp_lag_365",
+                "temp_rolling_mean_90",
+                "temp_rolling_std_90"
+            ],
+            "importances": "                 feature  importance\n0             temp_lag_1         268\n1             temp_lag_2         223\n2            temp_lag_14         190\n3           temp_lag_365         169\n4    temp_rolling_mean_7         169\n5    temp_rolling_std_90         160\n6             temp_lag_3         155\n7    temp_rolling_std_30         144\n8   temp_rolling_mean_90         136\n9    temp_rolling_std_14         136\n10         fourier_cos_1         133\n11    temp_rolling_std_7         124\n12            temp_lag_7         122\n13  temp_rolling_mean_14         105\n14  temp_rolling_mean_30          96\n15         fourier_sin_4          95\n16         fourier_sin_2          86\n17                   day          83\n18             dayofweek          77\n19         fourier_cos_4          71\n20         fourier_sin_1          62\n21         fourier_sin_3          58\n22         fourier_cos_3          55\n23                  year          51\n24         fourier_cos_2          25\n25                 month           7"
+        },
+        {
+            "iteration": 4,
+            "plan": "[{'function': 'create_embedding_features', 'args': {'col': 'temp', 'window_size': 90}}, {'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [365], 'aggs': ['mean']}}, {'function': 'create_interaction_features', 'args': {'col1': 'temp_lag_1', 'col2': 'fourier_cos_1'}}]",
+            "feature_name": "embed_0_win90, temp_rolling_mean_365, temp_lag_1_x_fourier_cos_1",
+            "performance": 1.8059565696534994,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3",
+                "fourier_sin_4",
+                "fourier_cos_4",
+                "temp_lag_365",
+                "temp_rolling_mean_90",
+                "temp_rolling_std_90"
+            ],
+            "importances": "                 feature  importance\n0             temp_lag_1         268\n1             temp_lag_2         223\n2            temp_lag_14         190\n3           temp_lag_365         169\n4    temp_rolling_mean_7         169\n5    temp_rolling_std_90         160\n6             temp_lag_3         155\n7    temp_rolling_std_30         144\n8   temp_rolling_mean_90         136\n9    temp_rolling_std_14         136\n10         fourier_cos_1         133\n11    temp_rolling_std_7         124\n12            temp_lag_7         122\n13  temp_rolling_mean_14         105\n14  temp_rolling_mean_30          96\n15         fourier_sin_4          95\n16         fourier_sin_2          86\n17                   day          83\n18             dayofweek          77\n19         fourier_cos_4          71\n20         fourier_sin_1          62\n21         fourier_sin_3          58\n22         fourier_cos_3          55\n23                  year          51\n24         fourier_cos_2          25\n25                 month           7"
+        },
+        {
+            "iteration": 5,
+            "plan": "[{'function': 'create_mvse_features', 'args': {'hist_len': 365, 'num_lags': 7}}, {'function': 'create_embedding_features', 'args': {'col': 'temp', 'window_size': 730}}]",
+            "feature_name": "mvse_features, embed_0_win730",
+            "performance": 1.819310903644143,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3",
+                "fourier_sin_4",
+                "fourier_cos_4",
+                "temp_lag_365",
+                "temp_rolling_mean_90",
+                "temp_rolling_std_90"
+            ],
+            "importances": "                 feature  importance\n0             temp_lag_1         268\n1             temp_lag_2         223\n2            temp_lag_14         190\n3           temp_lag_365         169\n4    temp_rolling_mean_7         169\n5    temp_rolling_std_90         160\n6             temp_lag_3         155\n7    temp_rolling_std_30         144\n8   temp_rolling_mean_90         136\n9    temp_rolling_std_14         136\n10         fourier_cos_1         133\n11    temp_rolling_std_7         124\n12            temp_lag_7         122\n13  temp_rolling_mean_14         105\n14  temp_rolling_mean_30          96\n15         fourier_sin_4          95\n16         fourier_sin_2          86\n17                   day          83\n18             dayofweek          77\n19         fourier_cos_4          71\n20         fourier_sin_1          62\n21         fourier_sin_3          58\n22         fourier_cos_3          55\n23                  year          51\n24         fourier_cos_2          25\n25                 month           7"
+        },
+        {
+            "iteration": 6,
+            "plan": "[{'function': 'create_mvse_features', 'args': {'hist_len': 180, 'num_lags': 30}}, {'function': 'create_fourier_features', 'args': {'col': 'date', 'order': 6}}]",
+            "feature_name": "mvse_features, fourier_features_order_6",
+            "performance": 1.8306108716320513,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3",
+                "fourier_sin_4",
+                "fourier_cos_4",
+                "temp_lag_365",
+                "temp_rolling_mean_90",
+                "temp_rolling_std_90"
+            ],
+            "importances": "                 feature  importance\n0             temp_lag_1         268\n1             temp_lag_2         223\n2            temp_lag_14         190\n3           temp_lag_365         169\n4    temp_rolling_mean_7         169\n5    temp_rolling_std_90         160\n6             temp_lag_3         155\n7    temp_rolling_std_30         144\n8   temp_rolling_mean_90         136\n9    temp_rolling_std_14         136\n10         fourier_cos_1         133\n11    temp_rolling_std_7         124\n12            temp_lag_7         122\n13  temp_rolling_mean_14         105\n14  temp_rolling_mean_30          96\n15         fourier_sin_4          95\n16         fourier_sin_2          86\n17                   day          83\n18             dayofweek          77\n19         fourier_cos_4          71\n20         fourier_sin_1          62\n21         fourier_sin_3          58\n22         fourier_cos_3          55\n23                  year          51\n24         fourier_cos_2          25\n25                 month           7"
+        },
+        {
+            "iteration": 7,
+            "plan": "[{'function': 'create_mvse_features', 'args': {'hist_len': 120, 'num_lags': 10}}, {'function': 'create_fourier_features', 'args': {'col': 'date', 'order': 5}}, {'function': 'create_interaction_features', 'args': {'col1': 'temp_lag_1', 'col2': 'temp_rolling_mean_7'}}]",
+            "feature_name": "mvse_features, fourier_features_order_5, temp_lag_1_x_temp_rolling_mean_7",
+            "performance": 1.8396914995684284,
+            "adopted": "False",
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "fourier_sin_1",
+                "fourier_cos_1",
+                "fourier_sin_2",
+                "fourier_cos_2",
+                "fourier_sin_3",
+                "fourier_cos_3",
+                "fourier_sin_4",
+                "fourier_cos_4",
+                "temp_lag_365",
+                "temp_rolling_mean_90",
+                "temp_rolling_std_90"
+            ],
+            "importances": "                 feature  importance\n0             temp_lag_1         268\n1             temp_lag_2         223\n2            temp_lag_14         190\n3           temp_lag_365         169\n4    temp_rolling_mean_7         169\n5    temp_rolling_std_90         160\n6             temp_lag_3         155\n7    temp_rolling_std_30         144\n8   temp_rolling_mean_90         136\n9    temp_rolling_std_14         136\n10         fourier_cos_1         133\n11    temp_rolling_std_7         124\n12            temp_lag_7         122\n13  temp_rolling_mean_14         105\n14  temp_rolling_mean_30          96\n15         fourier_sin_4          95\n16         fourier_sin_2          86\n17                   day          83\n18             dayofweek          77\n19         fourier_cos_4          71\n20         fourier_sin_1          62\n21         fourier_sin_3          58\n22         fourier_cos_3          55\n23                  year          51\n24         fourier_cos_2          25\n25                 month           7"
+        }
+    ]
+}

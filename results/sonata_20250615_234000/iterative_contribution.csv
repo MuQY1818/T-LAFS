@@ -1,0 +1,11 @@
+step,feature_name,marginal_contribution,cumulative_performance
+1,"time_features_macro_set, lag_features_macro_set_on_temp, rolling_features_macro_set_on_temp",0.6988604298437756,0.6988604298437756
+8,"deleted_2_features, temp_lag_1_x_month, embed_0_win730",0.01946743916249294,0.7123254606533294
+10,"deleted_3_features, embed_0_win730, temp_lag_1_x_temp_lag_365",0.008640603146894188,0.7106885131418401
+2,"temp_lag_1_x_dayofweek, temp_lag_365",0.0068655434750960476,0.7057259733188717
+5,"temp_lag_2_x_dayofweek, fourier_features_order_1",0.004443212908325944,0.7055977874231169
+4,"deleted_2_features, temp_lag_1_x_month, embed_0_win90",-0.0005026732904140907,0.7011545745147909
+6,"temp_lag_7_x_dayofweek, temp_lag_90, temp_rolling_std_30_x_dayofweek",-0.0018033002629070927,0.7037944871602098
+3,"temp_lag_2_x_month, temp_lag_365_rolling_std_7",-0.00406872551366666,0.701657247805205
+9,"deleted_2_features, temp_lag_3_x_month, embed_0_win365",-0.010277550658383428,0.7020479099949459
+7,"temp_lag_365_x_dayofweek, embed_0_win365",-0.01093646566937334,0.6928580214908364

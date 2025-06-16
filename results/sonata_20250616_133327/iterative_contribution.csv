@@ -1,0 +1,8 @@
+step,feature_name,marginal_contribution,cumulative_performance
+7,"rolling_features_macro_set_on_mvse_feat_7, mvse_gap_min_x_mvse_feat_2_rolling_std_7",0.050502511882442924,2.231270957650874
+5,"lag_features_macro_set_on_mvse_feat_2, embed_0_win90",0.02123512085057122,2.208083675806768
+3,"embed_0_win365, deleted_3_features",0.016388284660469044,2.2154649294044315
+2,"time_features_macro_set, embed_0_win90",-0.00469220818416094,2.1990766447439625
+6,"deleted_1_features, rolling_features_macro_set_on_mvse_feat_2",-0.027315230038337024,2.180768445768431
+4,"deleted_4_features, fourier_features_order_3",-0.028616374448234616,2.186848554956197
+1,mvse_features,-1.1950249170099516,2.2037688529281234

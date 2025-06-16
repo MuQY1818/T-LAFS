@@ -1,0 +1,383 @@
+{
+    "probe_model": "Sonata_Transformer_Specialist",
+    "best_score_during_search": 0.7135100433152104,
+    "best_feature_plan": [
+        [
+            {
+                "function": "create_time_features_macro",
+                "args": {}
+            },
+            {
+                "function": "create_lag_features_macro",
+                "args": {
+                    "col": "temp"
+                }
+            },
+            {
+                "function": "create_rolling_features_macro",
+                "args": {
+                    "col": "temp"
+                }
+            }
+        ],
+        [
+            {
+                "function": "create_interaction_features",
+                "args": {
+                    "col1": "dayofweek",
+                    "col2": "temp_lag_1"
+                }
+            },
+            {
+                "function": "create_rolling_features",
+                "args": {
+                    "col": "temp",
+                    "windows": [
+                        7,
+                        30
+                    ],
+                    "aggs": [
+                        "min"
+                    ]
+                }
+            }
+        ],
+        [
+            {
+                "function": "create_interaction_features",
+                "args": {
+                    "col1": "dayofweek",
+                    "col2": "temp_rolling_std_30"
+                }
+            },
+            {
+                "function": "create_rolling_features",
+                "args": {
+                    "col": "temp",
+                    "windows": [
+                        7,
+                        30
+                    ],
+                    "aggs": [
+                        "max"
+                    ]
+                }
+            }
+        ],
+        [
+            {
+                "function": "delete_features",
+                "args": {
+                    "cols": [
+                        "dayofweek",
+                        "year"
+                    ]
+                }
+            },
+            {
+                "function": "create_interaction_features",
+                "args": {
+                    "col1": "month",
+                    "col2": "temp_lag_1"
+                }
+            },
+            {
+                "function": "create_rolling_features",
+                "args": {
+                    "col": "temp",
+                    "windows": [
+                        7,
+                        30
+                    ],
+                    "aggs": [
+                        "median"
+                    ]
+                }
+            }
+        ],
+        [
+            {
+                "function": "delete_features",
+                "args": {
+                    "cols": [
+                        "day",
+                        "temp_rolling_mean_7",
+                        "temp_rolling_mean_14",
+                        "temp_rolling_mean_30",
+                        "dayofweek_x_temp_lag_1"
+                    ]
+                }
+            },
+            {
+                "function": "create_interaction_features",
+                "args": {
+                    "col1": "month",
+                    "col2": "temp_lag_14"
+                }
+            }
+        ]
+    ],
+    "final_features": [
+        "month",
+        "temp_lag_1",
+        "temp_lag_2",
+        "temp_rolling_min_7",
+        "temp_rolling_min_30",
+        "dayofweek_x_temp_rolling_std_30",
+        "temp_rolling_max_7",
+        "temp_rolling_max_30",
+        "month_x_temp_lag_1",
+        "temp_rolling_median_7",
+        "temp_rolling_median_30",
+        "month_x_temp_lag_14"
+    ],
+    "final_validation_scores_all_models": {
+        "LightGBM": {
+            "r2": 0.7098358226424653,
+            "mae": 1.750480559134562,
+            "rmse": 2.2105881929586304
+        },
+        "SimpleNN": {
+            "r2": 0.722422057613193,
+            "mae": 1.6947234978087962,
+            "rmse": 2.1621131822868707
+        },
+        "EnhancedNN": {
+            "r2": 0.7153478447062414,
+            "mae": 1.7168278509949986,
+            "rmse": 2.1894911134169366
+        },
+        "Transformer": {
+            "r2": 0.7158759350294192,
+            "mae": 1.7048622274398804,
+            "rmse": 2.1874591845904496
+        }
+    },
+    "best_final_model": {
+        "name": "SimpleNN",
+        "metrics": {
+            "r2": 0.722422057613193,
+            "mae": 1.6947234978087962,
+            "rmse": 2.1621131822868707
+        }
+    },
+    "run_history": [
+        {
+            "iteration": 0,
+            "plan": "Baseline",
+            "feature_name": "Baseline",
+            "performance": 0.0,
+            "adopted": true,
+            "available_features": [],
+            "importances": "Empty DataFrame\nColumns: []\nIndex: []"
+        },
+        {
+            "iteration": 1,
+            "plan": "[{'function': 'create_time_features_macro', 'args': {}}, {'function': 'create_lag_features_macro', 'args': {'col': 'temp'}}, {'function': 'create_rolling_features_macro', 'args': {'col': 'temp'}}]",
+            "feature_name": "time_features_macro_set, lag_features_macro_set_on_temp, rolling_features_macro_set_on_temp",
+            "performance": 0.6988604298437756,
+            "adopted": true,
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30"
+            ],
+            "importances": "                 feature  importance\n0             temp_lag_1         327\n1             temp_lag_2         309\n2            temp_lag_14         275\n3    temp_rolling_std_30         235\n4   temp_rolling_mean_30         215\n5             temp_lag_3         209\n6    temp_rolling_mean_7         197\n7    temp_rolling_std_14         195\n8     temp_rolling_std_7         193\n9   temp_rolling_mean_14         181\n10            temp_lag_7         176\n11                 month         156\n12                   day         143\n13             dayofweek         105\n14                  year          84"
+        },
+        {
+            "iteration": 2,
+            "plan": "[{'function': 'create_interaction_features', 'args': {'col1': 'dayofweek', 'col2': 'temp_lag_1'}}, {'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [7, 30], 'aggs': ['min']}}]",
+            "feature_name": "dayofweek_x_temp_lag_1, temp_rolling_min_30",
+            "performance": 0.7010915327018472,
+            "adopted": true,
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "dayofweek_x_temp_lag_1",
+                "temp_rolling_min_7",
+                "temp_rolling_min_30"
+            ],
+            "importances": "                   feature  importance\n0               temp_lag_1         286\n1               temp_lag_2         276\n2              temp_lag_14         251\n3      temp_rolling_std_30         220\n4       temp_rolling_std_7         205\n5               temp_lag_3         201\n6   dayofweek_x_temp_lag_1         190\n7      temp_rolling_std_14         180\n8               temp_lag_7         174\n9      temp_rolling_mean_7         156\n10    temp_rolling_mean_30         138\n11                     day         133\n12                   month         127\n13      temp_rolling_min_7         119\n14    temp_rolling_mean_14         118\n15     temp_rolling_min_30         104\n16                    year          84\n17               dayofweek          38"
+        },
+        {
+            "iteration": 3,
+            "plan": "[{'function': 'create_interaction_features', 'args': {'col1': 'dayofweek', 'col2': 'temp_rolling_std_30'}}, {'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [7, 30], 'aggs': ['max']}}]",
+            "feature_name": "dayofweek_x_temp_rolling_std_30, temp_rolling_max_30",
+            "performance": 0.7071111323303781,
+            "adopted": true,
+            "available_features": [
+                "year",
+                "month",
+                "day",
+                "dayofweek",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "dayofweek_x_temp_lag_1",
+                "temp_rolling_min_7",
+                "temp_rolling_min_30",
+                "dayofweek_x_temp_rolling_std_30",
+                "temp_rolling_max_7",
+                "temp_rolling_max_30"
+            ],
+            "importances": "                            feature  importance\n0                        temp_lag_1         279\n1                        temp_lag_2         258\n2                       temp_lag_14         207\n3               temp_rolling_std_30         204\n4                        temp_lag_3         188\n5                        temp_lag_7         165\n6               temp_rolling_std_14         150\n7                temp_rolling_std_7         148\n8               temp_rolling_mean_7         143\n9   dayofweek_x_temp_rolling_std_30         141\n10           dayofweek_x_temp_lag_1         136\n11               temp_rolling_min_7         130\n12             temp_rolling_mean_30         128\n13             temp_rolling_mean_14         123\n14               temp_rolling_max_7         117\n15                            month         108\n16                              day         108\n17              temp_rolling_max_30          96\n18              temp_rolling_min_30          79\n19                             year          76\n20                        dayofweek          16"
+        },
+        {
+            "iteration": 4,
+            "plan": "[{'function': 'delete_features', 'args': {'cols': ['dayofweek', 'year']}}, {'function': 'create_interaction_features', 'args': {'col1': 'month', 'col2': 'temp_lag_1'}}, {'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [7, 30], 'aggs': ['median']}}]",
+            "feature_name": "deleted_2_features, month_x_temp_lag_1, temp_rolling_median_30",
+            "performance": 0.7113360533931641,
+            "adopted": true,
+            "available_features": [
+                "month",
+                "day",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "dayofweek_x_temp_lag_1",
+                "temp_rolling_min_7",
+                "temp_rolling_min_30",
+                "dayofweek_x_temp_rolling_std_30",
+                "temp_rolling_max_7",
+                "temp_rolling_max_30",
+                "month_x_temp_lag_1",
+                "temp_rolling_median_7",
+                "temp_rolling_median_30"
+            ],
+            "importances": "                            feature  importance\n0                        temp_lag_2         242\n1                        temp_lag_1         207\n2                       temp_lag_14         196\n3                month_x_temp_lag_1         173\n4               temp_rolling_std_30         167\n5               temp_rolling_mean_7         155\n6                        temp_lag_3         150\n7               temp_rolling_std_14         145\n8                temp_rolling_std_7         138\n9   dayofweek_x_temp_rolling_std_30         135\n10                       temp_lag_7         134\n11           dayofweek_x_temp_lag_1         128\n12            temp_rolling_median_7         124\n13             temp_rolling_mean_14         117\n14               temp_rolling_max_7         115\n15           temp_rolling_median_30         114\n16             temp_rolling_mean_30         112\n17                              day         105\n18              temp_rolling_max_30          96\n19               temp_rolling_min_7          95\n20              temp_rolling_min_30          81\n21                            month          71"
+        },
+        {
+            "iteration": 5,
+            "plan": "[{'function': 'delete_features', 'args': {'cols': ['day', 'temp_rolling_mean_7', 'temp_rolling_mean_14']}}, {'function': 'create_interaction_features', 'args': {'col1': 'month', 'col2': 'temp_rolling_std_30'}}, {'function': 'create_rolling_features', 'args': {'col': 'temp', 'windows': [7, 30], 'aggs': ['var']}}]",
+            "feature_name": "deleted_3_features, month_x_temp_rolling_std_30, temp_rolling_var_30",
+            "performance": 0.7040732645569511,
+            "adopted": false,
+            "available_features": [
+                "month",
+                "day",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "dayofweek_x_temp_lag_1",
+                "temp_rolling_min_7",
+                "temp_rolling_min_30",
+                "dayofweek_x_temp_rolling_std_30",
+                "temp_rolling_max_7",
+                "temp_rolling_max_30",
+                "month_x_temp_lag_1",
+                "temp_rolling_median_7",
+                "temp_rolling_median_30"
+            ],
+            "importances": "                            feature  importance\n0                        temp_lag_2         242\n1                        temp_lag_1         207\n2                       temp_lag_14         196\n3                month_x_temp_lag_1         173\n4               temp_rolling_std_30         167\n5               temp_rolling_mean_7         155\n6                        temp_lag_3         150\n7               temp_rolling_std_14         145\n8                temp_rolling_std_7         138\n9   dayofweek_x_temp_rolling_std_30         135\n10                       temp_lag_7         134\n11           dayofweek_x_temp_lag_1         128\n12            temp_rolling_median_7         124\n13             temp_rolling_mean_14         117\n14               temp_rolling_max_7         115\n15           temp_rolling_median_30         114\n16             temp_rolling_mean_30         112\n17                              day         105\n18              temp_rolling_max_30          96\n19               temp_rolling_min_7          95\n20              temp_rolling_min_30          81\n21                            month          71"
+        },
+        {
+            "iteration": 6,
+            "plan": "[{'function': 'delete_features', 'args': {'cols': ['temp_rolling_mean_7', 'temp_rolling_mean_14', 'temp_rolling_mean_30', 'dayofweek_x_temp_lag_1']}}, {'function': 'create_interaction_features', 'args': {'col1': 'month', 'col2': 'temp_lag_2'}}, {'function': 'create_embedding_features', 'args': {'col': 'temp', 'window_size': 90}}]",
+            "feature_name": "deleted_4_features, month_x_temp_lag_2, embed_0_win90",
+            "performance": 0.7099178493463887,
+            "adopted": false,
+            "available_features": [
+                "month",
+                "day",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_mean_7",
+                "temp_rolling_std_7",
+                "temp_rolling_mean_14",
+                "temp_rolling_std_14",
+                "temp_rolling_mean_30",
+                "temp_rolling_std_30",
+                "dayofweek_x_temp_lag_1",
+                "temp_rolling_min_7",
+                "temp_rolling_min_30",
+                "dayofweek_x_temp_rolling_std_30",
+                "temp_rolling_max_7",
+                "temp_rolling_max_30",
+                "month_x_temp_lag_1",
+                "temp_rolling_median_7",
+                "temp_rolling_median_30"
+            ],
+            "importances": "                            feature  importance\n0                        temp_lag_2         242\n1                        temp_lag_1         207\n2                       temp_lag_14         196\n3                month_x_temp_lag_1         173\n4               temp_rolling_std_30         167\n5               temp_rolling_mean_7         155\n6                        temp_lag_3         150\n7               temp_rolling_std_14         145\n8                temp_rolling_std_7         138\n9   dayofweek_x_temp_rolling_std_30         135\n10                       temp_lag_7         134\n11           dayofweek_x_temp_lag_1         128\n12            temp_rolling_median_7         124\n13             temp_rolling_mean_14         117\n14               temp_rolling_max_7         115\n15           temp_rolling_median_30         114\n16             temp_rolling_mean_30         112\n17                              day         105\n18              temp_rolling_max_30          96\n19               temp_rolling_min_7          95\n20              temp_rolling_min_30          81\n21                            month          71"
+        },
+        {
+            "iteration": 7,
+            "plan": "[{'function': 'delete_features', 'args': {'cols': ['day', 'temp_rolling_mean_7', 'temp_rolling_mean_14', 'temp_rolling_mean_30', 'dayofweek_x_temp_lag_1']}}, {'function': 'create_interaction_features', 'args': {'col1': 'month', 'col2': 'temp_lag_14'}}]",
+            "feature_name": "deleted_5_features, month_x_temp_lag_14",
+            "performance": 0.7135100433152104,
+            "adopted": true,
+            "available_features": [
+                "month",
+                "temp_lag_1",
+                "temp_lag_2",
+                "temp_lag_3",
+                "temp_lag_7",
+                "temp_lag_14",
+                "temp_rolling_std_7",
+                "temp_rolling_std_14",
+                "temp_rolling_std_30",
+                "temp_rolling_min_7",
+                "temp_rolling_min_30",
+                "dayofweek_x_temp_rolling_std_30",
+                "temp_rolling_max_7",
+                "temp_rolling_max_30",
+                "month_x_temp_lag_1",
+                "temp_rolling_median_7",
+                "temp_rolling_median_30",
+                "month_x_temp_lag_14"
+            ],
+            "importances": "                            feature  importance\n0                        temp_lag_2         258\n1                        temp_lag_1         222\n2               temp_rolling_std_30         209\n3                        temp_lag_3         194\n4                       temp_lag_14         192\n5                month_x_temp_lag_1         192\n6             temp_rolling_median_7         190\n7   dayofweek_x_temp_rolling_std_30         188\n8               temp_rolling_std_14         183\n9               month_x_temp_lag_14         173\n10                       temp_lag_7         163\n11               temp_rolling_std_7         153\n12           temp_rolling_median_30         148\n13              temp_rolling_max_30         129\n14               temp_rolling_max_7         127\n15               temp_rolling_min_7         124\n16              temp_rolling_min_30          79\n17                            month          76"
+        }
+    ]
+}

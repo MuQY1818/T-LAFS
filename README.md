@@ -1,84 +1,99 @@
-# T-LAFS: Time-series Language-augmented Feature Search
+# TLAFS (Time Series Learning and Feature Selection)
 
-This project introduces **T-LAFS (Time-series Language-augmented Feature Search)**, an advanced, AI-driven framework for automated time-series feature engineering and forecasting.
+TLAFS是一个用于时间序列预测的高级特征选择和学习的Python包。它结合了多种先进的技术，包括多视角序列编码(MVSE)、探针预测器和基于LLM的特征工程。
 
-The core of this project is the `clp_probe_experiment.py` script, a highly configurable entry point that demonstrates the full capabilities of the T-LAFS framework on various time-series datasets.
+## 项目结构
 
-## Core Idea: Probe-and-Validate Strategy
+```
+tlafs/
+├── core/           # 核心算法实现
+│   ├── __init__.py
+│   └── algorithm.py
+├── models/         # 模型定义
+│   ├── __init__.py
+│   └── neural_models.py
+├── features/       # 特征工程
+│   ├── __init__.py
+│   └── mvse.py
+├── utils/          # 工具函数
+│   ├── __init__.py
+│   └── common.py
+├── experiments/    # 实验脚本
+│   ├── __init__.py
+│   ├── baseline.py
+│   ├── control.py
+│   └── sonata.py
+└── visualization/  # 可视化工具
+    ├── __init__.py
+    └── plotting.py
+```
 
-T-LAFS utilizes a novel **"Probe-and-Validate"** strategy to achieve state-of-the-art forecasting performance.
+## 主要功能
 
-1.  **Probe Phase**: An AI Strategist, powered by a Large Language Model (LLM), collaborates with a specialized **"Probe" model** (e.g., `DualStreamAttentionProbe`, `QuantumDualStreamProbe`). The LLM generates feature engineering plans (e.g., creating lags, interactions, rolling statistics) which are then executed. The selected Probe model evaluates the effectiveness of these new features. This iterative process allows the system to automatically search the vast feature space and discover an optimal set of features. The AI can also decide to prune less useful features, making the search more efficient.
+1. 多视角序列编码 (MVSE)
+   - 多视角LSTM编码
+   - 注意力机制
+   - 掩码学习
 
-2.  **Validate Phase**: Once the optimal feature set is discovered by the probe, it is handed off to a suite of diverse, powerful models (including LightGBM, RandomForest, XGBoost, and various Neural Networks like Transformers). These models are trained on the AI-generated features, and the best-performing model is selected as the final champion.
+2. 探针预测器
+   - 基于Transformer的预测
+   - 位置编码
+   - 代理注意力
 
-This strategy ensures that the feature engineering is not overfitted to a single model architecture and that the discovered features are robust and widely effective.
+3. 特征工程
+   - 自动特征选择
+   - 基于LLM的特征生成
+   - 特征重要性分析
 
-## Key Features
+4. 模型评估
+   - 多模型比较
+   - 性能指标计算
+   - 可视化工具
 
-- **Automated Feature Engineering**: Leverages an LLM (e.g., GPT-4o) to intelligently add, create, and remove features.
-- **Modular Probe Architecture**: Easily switch between different probe models (e.g., standard `DualStream`, `QuantumDualStream`) to evaluate different feature-sensing strategies.
-- **Flexible Dataset Handling**: Switch between different datasets by changing a single variable in the main script. The framework adapts automatically.
-- **Robust Validation**: The final feature set is validated against a wide range of standard and advanced models to ensure generalization.
-- **Data-Leakage Safe**: The entire framework is built with strict adherence to time-series principles, ensuring no future information is leaked during feature creation or model training.
-- **Result Persistence**: Automatically saves comprehensive experiment results, including the best feature plan and all model scores, to a JSON file in the `results/` directory.
+## 安装
 
-## Technology Stack
+```bash
+pip install -e .
+```
 
-- **Core**: Python 3.x
-- **AI/ML**:
-    - PyTorch
-    - Scikit-learn
-    - LightGBM
-    - XGBoost
-- **Data Handling**: Pandas, NumPy
-- **LLM Integration**: OpenAI API
-- **Plotting**: Matplotlib
+## 使用示例
 
-## How to Run the Experiment
+```python
+from tlafs.core.algorithm import TLAFS_Algorithm
+import pandas as pd
 
-1.  **Setup Environment**:
-    - Make sure you have Python installed.
-    - Install the required packages:
-      ```bash
-      pip install pandas numpy torch scikit-learn lightgbm xgboost openai matplotlib
-      ```
-2.  **Set API Keys**:
-    - For the LLM strategist to work, you must set your OpenAI API key and base URL as environment variables.
-      ```bash
-      export OPENAI_API_KEY="your_api_key"
-      export OPENAI_BASE_URL="your_base_url" # Optional, if using a proxy
-      ```
-      (On Windows, use `set` instead of `export`).
-      If you don't set these, the script will fall back to a pre-defined, non-AI plan.
+# 加载数据
+df = pd.read_csv('your_data.csv')
 
-3.  **Configure the Experiment**:
-    - Open the `clp_probe_experiment.py` file.
-    - Inside the `main()` function, you can easily configure the experiment:
-      - **`DATASET_TYPE`**: Choose the dataset to use.
-        - `'min_daily_temps'`: The original daily minimum temperatures dataset.
-        - `'total_cleaned'`: A dataset of daily transaction counts.
-      - **`PROBE_NAME`**: Select the probe model to guide the feature search.
-        - `'dual_stream'`: The standard Dual-Stream Attention Probe.
-        - `'quantum_dual_stream'`: A probe inspired by quantum mechanics principles.
-        - `'bayesian_quantum'`: A probe incorporating Bayesian principles with quantum concepts.
+# 初始化TLAFS算法
+tlafs = TLAFS_Algorithm(
+    base_df=df,
+    target_col='target',
+    n_iterations=5
+)
 
-    Example configuration:
-    ```python
-    def main():
-        # ===== Configure your experiment here =====
-        DATASET_TYPE = 'total_cleaned'  # Switch to the sales dataset
-        PROBE_NAME = 'quantum_dual_stream' # Use the quantum probe
-        # ... rest of the settings ...
-    ```
+# 运行算法
+results = tlafs.run()
+```
 
-4.  **Run the script**:
-    ```bash
-    python clp_probe_experiment.py
-    ```
+## 依赖
 
-The script will execute the full Probe-and-Validate pipeline using your configuration. Final results, including plots and a JSON summary, will be saved to the `plots/` and `results/` directories respectively.
+- Python >= 3.7
+- PyTorch >= 1.7.0
+- scikit-learn >= 0.24.0
+- pandas >= 1.2.0
+- numpy >= 1.19.2
+- matplotlib >= 3.3.0
+- lightgbm >= 3.1.0
+- xgboost >= 1.3.0
+- catboost >= 0.24.0
+- pytorch-tabnet >= 3.0.0
+- google-generativeai >= 0.1.0
 
-## Example Result
+## 贡献
 
-On the `min_daily_temps.csv` dataset, a previous run of the T-LAFS framework automatically discovered a feature set that allowed a **Transformer** model to achieve a final **R² score of 0.9977**, showcasing the power of AI-driven feature discovery. By changing the configuration, you can now apply this powerful framework to other datasets like `total_cleaned.csv`.
+欢迎提交问题和拉取请求！
+
+## 许可证
+
+MIT License

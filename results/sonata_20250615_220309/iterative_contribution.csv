@@ -1,0 +1,12 @@
+step,feature_name,marginal_contribution,cumulative_performance
+1,control_baseline_features_set,0.1251493572672,0.715785190683204
+5,"deleted_1_features, temp_lag_21, weekofyear_x_temp_lag_1",0.018296602271080653,0.7145159124529876
+10,"deleted_1_features, dayofweek_x_temp_rolling_std_7",0.010729541407561327,0.7102243419094632
+11,deleted_1_features,0.005560848773740856,0.715785190683204
+3,"temp_lag_28, temp_rolling_mean_60",0.0028870951602508743,0.7123020123365007
+8,"deleted_1_features, embed_0_win730",-0.0006443137996772208,0.7033036702960611
+7,"deleted_1_features, embed_0_win90",-0.002929089691300568,0.7039479840957383
+9,"deleted_1_features, fourier_features_order_3",-0.0038088697941592864,0.6994948005019018
+2,"fourier_features_order_2, is_weekend_x_temp_lag_1",-0.006370273506954183,0.7094149171762498
+6,"deleted_1_features, temp_lag_6",-0.007638838665948722,0.7068770737870389
+4,"embed_0_win365, temp_lag_365, month_x_temp_lag_1",-0.01608270215459373,0.696219310181907

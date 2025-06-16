@@ -1,0 +1,261 @@
+{
+    "probe_model": "Sonata_Transformer_Specialist",
+    "best_score_during_search": 0.7063725719594116,
+    "best_feature_plan": [
+        {
+            "operation": "create_lag",
+            "feature": "temp",
+            "days": 1,
+            "id": "lag1"
+        },
+        {
+            "operation": "create_rolling_mean",
+            "on": "temp",
+            "window": 7
+        },
+        {
+            "operation": "create_fourier_features",
+            "period": 365.25,
+            "order": 4
+        }
+    ],
+    "final_features": [
+        "dayofweek",
+        "month",
+        "weekofyear",
+        "is_weekend",
+        "temp_lag1",
+        "temp_roll_mean7"
+    ],
+    "final_validation_scores": {
+        "LightGBM": {
+            "r2": 0.7063725719594116,
+            "mae": 1.7542205824407848,
+            "rmse": 2.2237412852348526
+        },
+        "SimpleNN": {
+            "r2": 0.7062546624584127,
+            "mae": 1.7552173105004716,
+            "rmse": 2.224187724979838
+        },
+        "EnhancedNN": {
+            "r2": 0.7041948267149453,
+            "mae": 1.7568135468600545,
+            "rmse": 2.2319724574725073
+        },
+        "Transformer": {
+            "r2": 0.6958565866752042,
+            "mae": 1.7808091040180154,
+            "rmse": 2.263211579080407
+        }
+    },
+    "best_final_model": {
+        "name": "LightGBM",
+        "metrics": {
+            "r2": 0.7063725719594116,
+            "mae": 1.7542205824407848,
+            "rmse": 2.2237412852348526
+        }
+    },
+    "run_history": [
+        {
+            "iteration": 1,
+            "plan": [
+                {
+                    "operation": "create_rolling_mean",
+                    "on": "temp",
+                    "window": 7
+                },
+                {
+                    "operation": "create_fourier_features",
+                    "period": 365.25,
+                    "order": 4
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 5.364100296278984e-05
+        },
+        {
+            "iteration": 2,
+            "plan": [
+                {
+                    "operation": "create_fourier_features",
+                    "on": "temp",
+                    "period": 365.25,
+                    "order": 4
+                },
+                {
+                    "operation": "create_ewm",
+                    "on": "temp",
+                    "span": 14
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        },
+        {
+            "iteration": 3,
+            "plan": [
+                {
+                    "operation": "create_fourier_features",
+                    "period": 365.25,
+                    "order": 4
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        },
+        {
+            "iteration": 4,
+            "plan": [
+                {
+                    "operation": "create_fourier_features",
+                    "period": 365.25,
+                    "order": 4
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        },
+        {
+            "iteration": 5,
+            "plan": [
+                {
+                    "operation": "create_fourier_features",
+                    "period": 365.25,
+                    "order": 4
+                },
+                {
+                    "operation": "create_mvse_features"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        },
+        {
+            "iteration": 6,
+            "plan": [
+                {
+                    "operation": "create_fourier_features",
+                    "period": 365.25,
+                    "order": 6
+                },
+                {
+                    "operation": "create_forecast_feature",
+                    "model_name": "EnhancedNN_meta"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        },
+        {
+            "iteration": 7,
+            "plan": [
+                {
+                    "operation": "create_mvse_features"
+                },
+                {
+                    "operation": "create_interaction",
+                    "features": [
+                        "temp_mvse",
+                        "temp_lag1"
+                    ]
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        },
+        {
+            "iteration": 8,
+            "plan": [
+                {
+                    "operation": "create_mvse_features"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        },
+        {
+            "iteration": 9,
+            "plan": [
+                {
+                    "operation": "create_mvse_features"
+                },
+                {
+                    "operation": "create_interaction",
+                    "features": [
+                        "temp_mvse",
+                        "temp_lag1"
+                    ]
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        },
+        {
+            "iteration": 10,
+            "plan": [
+                {
+                    "operation": "create_fourier_features",
+                    "period": 365.25,
+                    "order": 4
+                },
+                {
+                    "operation": "create_mvse_features"
+                }
+            ],
+            "probe_results": {
+                "primary_score": 0.7063725719594116,
+                "r2_lgbm": 0.7063725719594116,
+                "num_features": 6
+            },
+            "adopted": true,
+            "reward": 0.0
+        }
+    ]
+}
